@@ -1,0 +1,28 @@
+#formatting-container {
+  height: 0px;
+}
+
+#formatting-pop-up {
+  background-color: #d4dce4;
+  width: fit-content;
+  height: fit-content;
+  position: relative;
+  bottom: 35px;
+  left: 100px;
+  border-radius: 3px;
+}
+
+.formatting-button {
+  background-color: #e9eff4;
+  padding: 5px;
+  margin: 5px;
+  min-width: 25px;
+  font-size: 1.2em;
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+}
+
+.formatting-button:hover {
+  background-color: white;
+}

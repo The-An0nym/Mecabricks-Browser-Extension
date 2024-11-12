@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+
+  "name": "Mecabricks generic extension",
+  "version": "0.1.1",
+  "description": "3 features: Fixing emojis, formatting options & more user-friendly errors pop-ups",
+
+  "content_scripts": [
+    {
+      "js": ["user.js", "alert.min.js", "bbcode.js"],
+      "css": ["main.css"],
+      "matches": ["https://*.mecabricks.com/*"]
+    }
+  ]
+}
