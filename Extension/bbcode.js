@@ -25,7 +25,7 @@ function setUpBBCodeFormatter() {
   texta.parentNode.insertBefore(container, texta);
 
   // Set eventlistener
-  texta.addEventListener("mouseup", () => checkSelection(container));
+  document.addEventListener("mouseup", () => checkSelection(container));
   texta.addEventListener("keydown", () => (container.style.display = "none"));
 }
 
@@ -56,7 +56,7 @@ function formatSelection(str) {
   const end = texta.selectionEnd;
 
   const editable = ["url", "size", "color"].includes(str); // Bool for editables
-  const http = str === "url" && tv.slice(start, end).includes("http");
+  const http = str === "url" && tv.slice(start, end).includes("http"); // Bool if URL
 
   let str0 = editable ? "[" + str + "=" : "[" + str;
   let str1 = http ? "][/" + str + "]" : "[/" + str + "]";
@@ -71,7 +71,7 @@ function formatSelection(str) {
   texta.value = tv.slice(0, start) + str0 + tv.slice(start, end) + str1 + tv.slice(end);
   texta.select();
 
-  // do not nest!
+  // Mouse cursor or selection
   if (editable && http) {
     texta.selectionStart = texta.selectionEnd = end + str0.length + 1;
   } else if (editable) {
