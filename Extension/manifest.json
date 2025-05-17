@@ -1,13 +1,19 @@
 {
   "manifest_version": 3,
 
-  "name": "Mecabricks generic extension",
-  "version": "0.1.1",
-  "description": "3 features: Fixing emojis, formatting options & more user-friendly errors pop-ups",
-
+  "name": "Mecabricks Chrome Extension",
+  "version": "1.1",
+  "description": "Fixes emojis and prev/next on library searches containing quotes. Errors will not block user interaction. BBcode formatting options upon text highlight. Comments and posts by deleted users can be hidden by choice",
+  "action": {
+    "default_icon": {
+      "32": "32x32.png"
+    },
+    "default_popup": "index.html"
+  },
+  "permissions": ["storage", "activeTab", "scripting"],
   "content_scripts": [
     {
-      "js": ["user.js", "alert.min.js", "bbcode.js"],
+      "js": ["user.js", "alert.js", "bbcode.js", "delUsers.js"],
       "css": ["main.css"],
       "matches": ["https://*.mecabricks.com/*"]
     }
