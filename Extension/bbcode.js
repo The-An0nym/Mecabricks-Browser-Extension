@@ -1,53 +1,67 @@
-function setUpBBCodeFormatter() {
-  //prettier-ignore
-  const fTypes = ["i", "b", "u", "s", "center", "code", "img", "url", "color", "size"];
+function setUpBBCodeFormatter(textAs) {
+  for (texta of textAs) {
+    //prettier-ignore
+    const fTypes = ["i", "b", "u", "s", "center", "code", "img", "url", "color", "size"];
 
-  // Create container with 0px height
-  const container = document.createElement("div");
-  container.id = "formatting-container";
-  container.style.display = "none";
+    // Create container with 0px height
+    const container = document.createElement("div");
+    container.id = "formatting-container";
+    container.style.display = "none";
 
-  // Create pop-up containing buttons
-  const div = document.createElement("div");
-  div.id = "formatting-pop-up";
+    // Create pop-up containing buttons
+    const div = document.createElement("div");
+    div.id = "formatting-pop-up";
 
-  // Append buttons to pop-up
-  for (let type of fTypes) {
-    let button = document.createElement("button");
-    button.innerHTML = type;
-    button.addEventListener("click", () => formatSelection(type));
-    button.className = "formatting-button";
-    div.appendChild(button);
+    // Append buttons to pop-up
+    for (let type of fTypes) {
+      let button = document.createElement("button");
+      button.innerHTML = type;
+      button.addEventListener("mousedown", () => formatSelection(type));
+      button.className = "formatting-button";
+      div.appendChild(button);
+    }
+
+    // Append pop-up to container and container to DOM
+    container.appendChild(div);
+    texta.parentNode.insertBefore(container, texta);
+
+    // Set eventlistener
+    texta.addEventListener("mouseup", (e) =>
+      setTimeout(checkSelection, 10, container, e, true)
+    ); // Delay ensures window.getSelection() has time to update properly
+    texta.addEventListener("keyup", (e) => checkSelection(container, e, false));
+    texta.addEventListener(
+      "focusout",
+      () => (container.style.display = "none")
+    );
   }
-
-  // Append pop-up to container and container to DOM
-  container.appendChild(div);
-  texta.parentNode.insertBefore(container, texta);
-
-  // Set eventlistener
-  texta.addEventListener("focus", () => (container.style.display = "block"));
-  texta.addEventListener("focusout", () => (container.style.display = "none"));
 }
 
 // Check if text has been selected in textarea
-/*function checkSelection(container) {
-  if (
-    window.getSelection().toString() === "" ||
-    texta !== document.activeElement
-  ) {
+function checkSelection(container, e, removeWhiteSpace) {
+  texta = e.target;
+  const textSelection = window.getSelection().toString();
+  if (textSelection === "") {
     container.style.display = "none";
     return;
   }
-  // Remove end whitespace
-  if (
-    texta.value[texta.selectionEnd - 1] === " " ||
-    texta.value[texta.selectionEnd - 1] === "\n"
-  ) {
-    texta.selectionEnd--;
+
+  if (textSelection.trim() === "") {
+    return;
   }
-  console.log(texta.value.slice(texta.selectionStart, texta.selectionEnd));
+
+  if (removeWhiteSpace) {
+    if (textSelection.trim().length !== textSelection.length) {
+      const index = textSelection.indexOf(textSelection.trim());
+      texta.selectionStart += index;
+      texta.selectionEnd -=
+        textSelection.length - (index + textSelection.trim().length);
+      // Remove end whitespace
+      if (texta.selectionEnd === texta.selectionStart) return; // In case a single space was selected
+    }
+  }
   container.style.display = "block";
-}*/
+}
 
 // Add BBCode to user input
 function formatSelection(str) {
@@ -82,14 +96,21 @@ function formatSelection(str) {
   }
 }
 
-// Initializing variables
-const elements = document.getElementsByTagName("textarea");
-let texta;
+// Set texta (textarea) that will be edited -> Should add support for mutliple textareas
+function formattingSetup() {
+  const elements = document.getElementsByTagName("textarea");
+  if (elements.length != 0) {
+    setUpBBCodeFormatter(elements);
+  }
+}
 
 // Only allow specific pages & check if page has textarea
 if (["models", "topic", "category", "messages"].some((s) => url.includes(s))) {
-  if (elements.length != 0) {
-    texta = elements[elements.length - 1];
-    setUpBBCodeFormatter();
-  }
+  /*if (url.includes("topic")) {
+    const elements = document.getElementsByClassName("edit");
+    for (ele of elements) {
+      ele.addEventListener("mousedown", formattingSetup);
+    }
+  }*/
+  formattingSetup();
 }
