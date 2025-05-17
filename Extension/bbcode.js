@@ -25,12 +25,12 @@ function setUpBBCodeFormatter() {
   texta.parentNode.insertBefore(container, texta);
 
   // Set eventlistener
-  document.addEventListener("mouseup", () => checkSelection(container));
-  texta.addEventListener("keydown", () => (container.style.display = "none"));
+  texta.addEventListener("focus", () => (container.style.display = "block"));
+  texta.addEventListener("focusout", () => (container.style.display = "none"));
 }
 
 // Check if text has been selected in textarea
-function checkSelection(container) {
+/*function checkSelection(container) {
   if (
     window.getSelection().toString() === "" ||
     texta !== document.activeElement
