@@ -31,12 +31,18 @@ function setUpBBCodeFormatter() {
 
 // Check if text has been selected in textarea
 function checkSelection(container) {
-  if (window.getSelection().toString() === "") {
+  if (
+    window.getSelection().toString() === "" ||
+    texta !== document.activeElement
+  ) {
     container.style.display = "none";
     return;
   }
   // Remove end whitespace
-  if (texta.value[texta.selectionEnd - 1] === " ") {
+  if (
+    texta.value[texta.selectionEnd - 1] === " " ||
+    texta.value[texta.selectionEnd - 1] === "\n"
+  ) {
     texta.selectionEnd--;
   }
   console.log(texta.value.slice(texta.selectionStart, texta.selectionEnd));
