@@ -2,11 +2,16 @@
   "manifest_version": 3,
 
   "name": "Mecabricks Chrome Extension",
-  "version": "1.1",
-  "description": "Fixes emojis and prev/next on library searches containing quotes. Errors will not block user interaction. BBcode formatting options upon text highlight. Comments and posts by deleted users can be hidden by choice",
+  "version": "1.2",
+  "icons": {
+    "16": "16x16.png",
+    "48": "48x48.png",
+    "128": "128x128.png"
+  },
+  "description": "Fixes emojis and prev/next on library searches containing quotes. Errors will not block user interaction. BBcode formatting options upon text highlight. Comments and posts by deleted users can be hidden by choice and content by specified users can be hidden",
   "action": {
     "default_icon": {
-      "32": "32x32.png"
+      "16": "16x16.png"
     },
     "default_popup": "index.html"
   },
