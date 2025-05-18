@@ -1,6 +1,38 @@
+input {
+  margin: 2px 0;
+  padding: 4px;
+  font-size: 1em;
+}
+
+.item {
+  margin: 2px 0;
+  padding: 4px;
+}
+
+.button {
+  margin: 2px 0;
+  padding: 4px;
+  background-color: #2196f3;
+  border-radius: 6px;
+  border: 1px solid black;
+  color: white;
+  text-align: center;
+  transition-duration: 0.1s;
+}
+
+.button:hover {
+  background-color: #ccc;
+  cursor: pointer;
+}
+
 #options {
-  min-width: 280px;
+  min-width: 320px;
   font-size: 1.8em;
+  display: flex;
+  flex-direction: column;
+}
+
+.toggable {
   display: flex;
   justify-content: space-between;
 }
@@ -66,4 +98,30 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+/* HIDDEN USERS */
+#back {
+  width: min-content;
+}
+
+#hidden-users {
+  min-width: 320px;
+  font-size: 1.8em;
+  flex-direction: column;
+  display: none;
+}
+
+#users-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+  overflow-y: scroll;
+}
+
+.hidden-user-wrapper {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid black;
+  overflow-wrap: anywhere;
 }

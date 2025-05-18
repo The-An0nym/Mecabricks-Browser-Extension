@@ -7,11 +7,27 @@
   </head>
   <body>
     <div id="options">
-      <span>Hide deleted users</span>
-      <label class="switch">
-        <input id="del_user" type="checkbox" />
-        <span class="slider round"></span>
-      </label>
+      <span class="item toggable" id="hide-deleted-users">
+        <span>Hide deleted users</span>
+        <label class="switch">
+          <input id="del_user" type="checkbox" />
+          <span class="slider round"></span>
+        </label>
+      </span>
+      <span class="item toggable" id="number-notifications">
+        <span>Numbered Notifications</span>
+        <label class="switch">
+          <input id="num_notifications" type="checkbox" />
+          <span class="slider round"></span>
+        </label>
+      </span>
+      <span class="button" id="manage-hidden">Manage hidden users</span>
+    </div>
+    <div id="hidden-users">
+      <span class="button" id="back">Back</span>
+      <input id="inp" />
+      <span class="button" id="hide">Hide</span>
+      <span class="item" id="users-wrapper"></span>
     </div>
     <script src="index.js"></script>
   </body>

@@ -13,7 +13,7 @@
   "permissions": ["storage", "activeTab", "scripting"],
   "content_scripts": [
     {
-      "js": ["user.js", "alert.js", "bbcode.js", "delUsers.js"],
+      "js": ["user.js", "alert.js", "bbcode.js", "removeContent.js"],
       "css": ["main.css"],
       "matches": ["https://*.mecabricks.com/*"]
     }
