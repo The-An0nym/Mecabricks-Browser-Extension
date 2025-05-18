@@ -8,7 +8,7 @@
     "48": "48x48.png",
     "128": "128x128.png"
   },
-  "description": "Fixes emojis and prev/next on library searches containing quotes. Errors will not block user interaction. BBcode formatting options upon text highlight. Comments and posts by deleted users can be hidden by choice and content by specified users can be hidden",
+  "description": "A chrome extension made to improve some aspects of Mecabricks and add some features that grant a nicer user experience. GitHub: https://github.com/The-An0nym/Mecabricks-Chrome-Extension",
   "action": {
     "default_icon": {
       "16": "16x16.png"
