@@ -1,6 +1,6 @@
 # Mecabricks Chrome Extension
 
-A semi-heavy chrome extension made to improve some aspects of Mecabricks.
+A chrome extension made to improve some aspects of Mecabricks and add some features that grant a nicer user experience.
 
 ## Features:
 
