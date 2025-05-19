@@ -4,22 +4,28 @@
   "name": "Mecabricks Chrome Extension",
   "version": "1.2",
   "icons": {
-    "16": "16x16.png",
-    "48": "48x48.png",
-    "128": "128x128.png"
+    "16": "icons/16x16.png",
+    "48": "icons/48x48.png",
+    "128": "icons/128x128.png"
   },
   "description": "A chrome extension made to improve some aspects of Mecabricks and add some features that grant a nicer user experience. GitHub: https://github.com/The-An0nym/Mecabricks-Chrome-Extension",
   "action": {
     "default_icon": {
-      "16": "16x16.png"
+      "16": "icons/16x16.png"
     },
-    "default_popup": "index.html"
+    "default_popup": "menu/index.html",
+    "default_title": "Mecabricks Extension"
   },
   "permissions": ["storage", "activeTab", "scripting"],
   "content_scripts": [
     {
-      "js": ["user.js", "alert.js", "bbcode.js", "removeContent.js"],
-      "css": ["main.css"],
+      "js": [
+        "scripts/fix.js",
+        "scripts/alert.js",
+        "scripts/bbcode.js",
+        "scripts/removeContent.js"
+      ],
+      "css": ["styles/main.css"],
       "matches": ["https://*.mecabricks.com/*"]
     }
   ]

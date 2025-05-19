@@ -161,7 +161,9 @@ function removeNotifications(users) {
                 items[i].remove();
               }
               // MODELS
-            } else if (items[i].getElementsByClassName("image-container")) {
+            } else if (
+              items[i].getElementsByClassName("image-container").length === 1
+            ) {
               // Locate username
               username = items[i].getElementsByClassName("user")[0].innerText;
               if (users.includes(username)) {
