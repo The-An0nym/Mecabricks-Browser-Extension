@@ -106,11 +106,5 @@ function formattingSetup() {
 
 // Only allow specific pages & check if page has textarea
 if (["models", "topic", "category", "messages"].some((s) => url.includes(s))) {
-  /*if (url.includes("topic")) {
-    const elements = document.getElementsByClassName("edit");
-    for (ele of elements) {
-      ele.addEventListener("mousedown", formattingSetup);
-    }
-  }*/
   formattingSetup();
 }

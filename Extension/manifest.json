@@ -23,7 +23,8 @@
         "scripts/fix.js",
         "scripts/alert.js",
         "scripts/bbcode.js",
-        "scripts/removeContent.js"
+        "scripts/removeContent.js",
+        "scripts/workshop.js"
       ],
       "css": ["styles/main.css"],
       "runAt": "document_start",

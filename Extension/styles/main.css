@@ -46,3 +46,24 @@
   user-select: text;
   cursor: auto;
 }
+
+/* WORKSHOP IMAGES */
+.image-item {
+  color: #fff;
+  height: 20px;
+  line-height: 20px;
+  padding-left: 6px;
+  position: relative;
+}
+
+#image-input-label {
+  display: block;
+}
+
+#image-input {
+  display: none;
+}
+
+#workbench > div.viewport > div.scene > canvas {
+  background-repeat: no-repeat;
+}

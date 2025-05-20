@@ -1,42 +1,41 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const hidUserToggle = document.getElementById("del_user");
-  const numNotifyToggle = document.getElementById("num_notifications");
-  const manageHidden = document.getElementById("manage-hidden");
-  const back = document.getElementById("back");
-  const hideButton = document.getElementById("hide");
+const hidUserToggle = document.getElementById("del_user");
+const numNotifyToggle = document.getElementById("num_notifications");
+const manageHidden = document.getElementById("manage-hidden");
+const back = document.getElementById("back");
+const hideButton = document.getElementById("hide");
 
-  /* HIDE DELETED USERS*/
-  // Load saved state
-  chrome.storage.sync.get("hideDeletedUsers", (data) => {
-    hidUserToggle.checked = data.hideDeletedUsers || false;
-  });
-
-  // Listen for changes to the checkbox
-  hidUserToggle.addEventListener("change", () => {
-    const isEnabled = hidUserToggle.checked;
-
-    // Save the state
-    chrome.storage.sync.set({ hideDeletedUsers: isEnabled });
-  });
-
-  /* NUMBERED NOTIFICATIONS */
-  // Load saved state
-  chrome.storage.sync.get("numberedNotifications", (data) => {
-    numNotifyToggle.checked = data.numberedNotifications || false;
-  });
-
-  // Listen for changes to the checkbox
-  numNotifyToggle.addEventListener("change", () => {
-    const isEnabled = numNotifyToggle.checked;
-
-    // Save the state
-    chrome.storage.sync.set({ numberedNotifications: isEnabled });
-  });
-
-  manageHidden.addEventListener("mouseup", listHiddenUsers);
-  back.addEventListener("mouseup", options);
-  hideButton.addEventListener("mouseup", hideUser);
+/* HIDE DELETED USERS*/
+// Load saved state
+chrome.storage.sync.get("hideDeletedUsers", (data) => {
+  hidUserToggle.checked = data.hideDeletedUsers || false;
 });
+
+// Listen for changes to the checkbox
+hidUserToggle.addEventListener("change", () => {
+  const isEnabled = hidUserToggle.checked;
+
+  // Save the state
+  chrome.storage.sync.set({ hideDeletedUsers: isEnabled });
+});
+
+/* NUMBERED NOTIFICATIONS */
+// Load saved state
+chrome.storage.sync.get("numberedNotifications", (data) => {
+  numNotifyToggle.checked = data.numberedNotifications || false;
+});
+
+// Listen for changes to the checkbox
+numNotifyToggle.addEventListener("change", () => {
+  const isEnabled = numNotifyToggle.checked;
+
+  // Save the state
+  chrome.storage.sync.set({ numberedNotifications: isEnabled });
+});
+
+// EVENT LISTENERS
+manageHidden.addEventListener("mouseup", listHiddenUsers);
+back.addEventListener("mouseup", options);
+hideButton.addEventListener("mouseup", hideUser);
 
 function options() {
   document.getElementById("options").style.display = "flex";

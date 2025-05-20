@@ -1,3 +1,11 @@
+#options {
+  display: block;
+}
+
+#workshop {
+  display: none;
+}
+
 input {
   margin: 2px 0;
   padding: 4px;
@@ -25,7 +33,7 @@ input {
   cursor: pointer;
 }
 
-#options {
+.options {
   min-width: 320px;
   font-size: 1.8em;
   display: flex;
@@ -101,14 +109,11 @@ input:checked + .slider:before {
 }
 
 /* HIDDEN USERS */
-#back {
+.back {
   width: min-content;
 }
 
 #hidden-users {
-  min-width: 320px;
-  font-size: 1.8em;
-  flex-direction: column;
   display: none;
 }
 
@@ -124,4 +129,9 @@ input:checked + .slider:before {
   justify-content: space-between;
   border-bottom: 1px solid black;
   overflow-wrap: anywhere;
+}
+
+/* WORKSHOP */
+#workshop-images {
+  display: none;
 }
