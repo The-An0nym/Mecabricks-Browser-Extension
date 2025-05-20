@@ -14,12 +14,19 @@ chrome.storage.sync.get("hideDeletedUsers", (data) => {
 // Check the toggle state and conditionally run the script
 chrome.storage.sync.get("numberedNotifications", (data) => {
   if (data.numberedNotifications) {
-    return;
-  }
-  if (url.includes("partmanager") || url.includes("notifications")) {
-    remNotifyNumber1();
+    document.body.style.setProperty("--font-color", "white");
   } else {
-    remNotifyNumber2();
+    if (!url.includes("partmanager") && !url.includes("notifications")) {
+      if (document.getElementById("header-notifications")) {
+        badge = document.getElementById("header-notifications");
+        badge.innerText = "";
+        badge.style.padding = "0";
+        badge.style.width = "16px";
+        badge.style.height = "16px";
+        badge.style.marginLeft = "-2px";
+        badge.style.borderRadius = "50%";
+      }
+    }
   }
 });
 
@@ -183,22 +190,4 @@ function removeNotifications(users) {
 
   // Start observing the target node for configured mutations
   observer.observe(targetNode, config);
-}
-
-function remNotifyNumber1() {
-  const u = document.getElementsByClassName("user")[0];
-  if (u.getElementsByClassName("notifications")) {
-    document.getElementsByClassName("notifications")[0].innerText = "";
-  }
-}
-
-function remNotifyNumber2() {
-  if (!document.getElementById("header-notifications")) return;
-  badge = document.getElementById("header-notifications");
-  badge.innerText = "";
-  badge.style.padding = "0";
-  badge.style.width = "16px";
-  badge.style.height = "16px";
-  badge.style.marginLeft = "-2px";
-  badge.style.borderRadius = "50%";
 }

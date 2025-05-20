@@ -1,3 +1,4 @@
+/* FORMATTER */
 #formatting-container {
   height: 0px;
 }
@@ -25,4 +26,23 @@
 
 .formatting-button:hover {
   background-color: white;
+}
+
+/* NOTIFICATIONS */
+
+:root {
+  --font-color: #ed1c24;
+}
+#header-notifications {
+  color: var(--font-color) !important;
+}
+.user > .notifications {
+  color: var(--font-color) !important;
+}
+
+/* MAKING PART REFERENCE SELECTABLE*/
+.ui-text-std {
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: auto;
 }

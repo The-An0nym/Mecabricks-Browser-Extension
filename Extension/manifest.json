@@ -26,7 +26,8 @@
         "scripts/removeContent.js"
       ],
       "css": ["styles/main.css"],
-      "matches": ["https://*.mecabricks.com/*"]
+      "runAt": "document_start",
+      "matches": ["https://mecabricks.com/*", "https://www.mecabricks.com/*"]
     }
   ]
 }

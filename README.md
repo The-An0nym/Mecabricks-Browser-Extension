@@ -22,3 +22,4 @@ A chrome extension made to improve some aspects of Mecabricks and add some featu
   - Posts (includes thread post)
   - Messages
   - Comments
+- Allows users to select the part reference in the Workshop when selecting a part
