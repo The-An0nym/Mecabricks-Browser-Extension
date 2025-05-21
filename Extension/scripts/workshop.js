@@ -7,6 +7,8 @@ if (url.includes("workshop")) appendContent();
 
 const displayedImageNames = [];
 const displayedImageSizes = [];
+const imagePositionsX = [];
+const imagePositionsY = [];
 
 function appendContent() {
   menuOption = createMenuOption();
@@ -76,18 +78,6 @@ function createMenuPanel() {
   listSection.id = "image-list";
   listSection.style.display = "none";
 
-  /*const todo = document.createElement("div");
-  todo.className = "image-text-item";
-
-  // Empty menu icon
-  const emptyMenuIcon2 = document.createElement("div");
-  emptyMenuIcon2.className = "ui-menu-icon ui-icon";
-  todo.appendChild(emptyMenuIcon2);
-
-  todo.appendChild(document.createTextNode("To do..."));
-
-  listSection.appendChild(todo);*/
-
   /* ADDING EVERYTHING */
   wrapper.appendChild(inputSection);
   wrapper.appendChild(listSection);
@@ -137,12 +127,19 @@ function createMenuOption() {
 }
 
 function createMenuImageSection(imageData) {
+  const imageIndex = displayedImageSizes.length - 1;
+  const imageName = displayedImageNames[imageIndex];
+  const imageSize = displayedImageSizes[imageIndex];
+  const imageXPos = imagePositionsX[imageIndex];
+  const imageYPos = imagePositionsY[imageIndex];
+
   const details = document.createElement("details");
   details.className = "image-item";
 
   const summary = document.createElement("summary");
-  summary.textContent = displayedImageNames[displayedImageNames.length - 1];
+  summary.textContent = imageName;
 
+  // PREVIEW
   const previewWrapper = document.createElement("div");
   previewWrapper.className = "preview-wrapper";
 
@@ -152,13 +149,71 @@ function createMenuImageSection(imageData) {
   previewWrapper.appendChild(preview);
   details.appendChild(previewWrapper);
 
+  // SIZE
   const size = document.createElement("div");
+
+  const sizeLabel = document.createElement("label");
+  sizeLabel.for = "size-" + imageIndex;
+  sizeLabel.textContent = "Size: ";
+  sizeLabel.className = "slider-label";
+
+  const sizeSlider = document.createElement("input");
+  sizeSlider.type = "range";
+  sizeSlider.min = "30";
+  sizeSlider.max = "100";
+  sizeSlider.value = imageSize;
+  sizeSlider.step = "2";
+  sizeSlider.id = "sizeSlider-" + imageIndex;
+  sizeSlider.addEventListener("input", changeSize);
+
+  size.appendChild(sizeLabel);
+  size.appendChild(sizeSlider);
+
   details.appendChild(size);
 
-  const position = document.createElement("div");
-  details.appendChild(position);
+  // POSITION X
+  const posX = document.createElement("div");
 
-  details.appendChild(summary);
+  const posXLabel = document.createElement("label");
+  posXLabel.for = "posXSlider-" + imageIndex;
+  posXLabel.textContent = "X: ";
+  posXLabel.className = "slider-label";
+
+  const posXSlider = document.createElement("input");
+  posXSlider.type = "range";
+  posXSlider.min = "0";
+  posXSlider.max = "100";
+  posXSlider.step = "2";
+  posXSlider.value = imageXPos;
+  posXSlider.id = "posXSlider-" + imageIndex;
+  posXSlider.addEventListener("input", changeXPos);
+
+  posX.appendChild(posXLabel);
+  posX.appendChild(posXSlider);
+
+  details.appendChild(posX);
+
+  // POSITION Y
+  const posY = document.createElement("div");
+
+  const posYLabel = document.createElement("label");
+  posYLabel.for = "posYSlider-" + imageIndex;
+  posYLabel.textContent = "Y: ";
+  posYLabel.className = "slider-label";
+
+  const posYSlider = document.createElement("input");
+  posYSlider.type = "range";
+  posYSlider.min = "0";
+  posYSlider.max = "100";
+  posYSlider.step = "2";
+  posYSlider.value = imageYPos;
+  posYSlider.id = "posYSlider-" + imageIndex;
+  posYSlider.addEventListener("input", changeYPos);
+
+  posY.appendChild(posYLabel);
+  posY.appendChild(posYSlider);
+
+  details.appendChild(posY);
 
   return details;
 }
@@ -175,7 +230,9 @@ function loadImage(e) {
   fileReader.readAsDataURL(file);
   fileReader.onload = function () {
     displayedImageNames.push(file.name);
-    displayedImageSizes.push(200);
+    displayedImageSizes.push(25);
+    imagePositionsX.push(0);
+    imagePositionsY.push(0);
     const previousImages = bgElement.style.backgroundImage;
     if (previousImages) {
       bgElement.style.backgroundImage = `${previousImages}, url('${fileReader.result}')`;
@@ -194,12 +251,31 @@ function updateImages() {
     "#workbench > div.viewport > div.scene > canvas"
   );
 
-  const imagePositionsX = [0].concat(
-    displayedImageSizes.map((elem, index) =>
-      displayedImageSizes.slice(0, index + 1).reduce((a, b) => a + b)
-    )
-  );
-  imagePositionsX.pop();
-  bgElement.style.backgroundSize = `${displayedImageSizes.join("px, ")}px`;
-  bgElement.style.backgroundPositionX = `${imagePositionsX.join("px, ")}px`;
+  bgElement.style.backgroundSize = `${displayedImageSizes.join("%, ")}%`;
+  bgElement.style.backgroundPositionX = `${imagePositionsX.join("%, ")}%`;
+  bgElement.style.backgroundPositionY = `${imagePositionsY.join("%, ")}%`;
+}
+
+function changeSize(e) {
+  index = e.target.id.split("-")[1];
+  if (isNaN(index)) return;
+  index = parseInt(index);
+  displayedImageSizes[index] = e.target.value;
+  updateImages();
+}
+
+function changeXPos(e) {
+  index = e.target.id.split("-")[1];
+  if (isNaN(index)) return;
+  index = parseInt(index);
+  imagePositionsX[index] = e.target.value;
+  updateImages();
+}
+
+function changeYPos(e) {
+  index = e.target.id.split("-")[1];
+  if (isNaN(index)) return;
+  index = parseInt(index);
+  imagePositionsY[index] = e.target.value;
+  updateImages();
 }

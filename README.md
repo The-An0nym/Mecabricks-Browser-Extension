@@ -23,3 +23,4 @@ A chrome extension made to improve some aspects of Mecabricks and add some featu
   - Messages
   - Comments
 - Allows users to select the part reference in the Workshop when selecting a part
+- Allows importing and displaying of reference image (displayed in the workshop background)
