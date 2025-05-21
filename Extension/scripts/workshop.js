@@ -1,8 +1,7 @@
 // ToDo ::
-// Generate dynamic list of already added images
-// Implement UI to add images
-// Implement Logic...
-// Allow pressing "image" button to HIDE the pop-up (currently it will simply re-generate it)
+// Generate dynamic list of already added images -> Consider using JSOn
+// Implement altering images
+// Implement removing images (and updating everything consequently)
 
 if (url.includes("workshop")) appendContent();
 
@@ -14,19 +13,24 @@ function appendContent() {
   menuPanel = createMenuPanel();
 
   document.addEventListener("mousedown", (e) =>
-    toggleMenu(e, menuOption, menuPanel)
+    toggleMenuEvent(e, menuOption, menuPanel)
   );
 }
 
-function toggleMenu(e, mO, mP) {
+function toggleMenuEvent(e, mO, mP) {
   if (!mP.contains(e.target) && !mO.contains(e.target)) {
     mP.style.display = "none";
   } else if (mO.contains(e.target)) {
-    if (mP.style.display === "block") {
-      mP.style.display = "none";
-    } else {
-      mP.style.display = "block";
-    }
+    toggleMenu();
+  }
+}
+
+function toggleMenu() {
+  const mP = document.getElementById("background-image-menu");
+  if (mP.style.display === "block") {
+    mP.style.display = "none";
+  } else {
+    mP.style.display = "block";
   }
 }
 
@@ -42,8 +46,8 @@ function createMenuPanel() {
   const wrapper = document.createElement("div");
 
   /* INPUT */
-  const inputsection = document.createElement("div");
-  inputsection.className = "section";
+  const inputSection = document.createElement("div");
+  inputSection.className = "section";
 
   const label = document.createElement("label");
   label.id = "image-input-label";
@@ -57,21 +61,23 @@ function createMenuPanel() {
 
   label.appendChild(document.createTextNode("Add reference image"));
 
-  inputsection.appendChild(label);
+  inputSection.appendChild(label);
 
   const input = document.createElement("input");
   input.id = "image-input";
   input.type = "file";
   input.addEventListener("change", loadImage);
 
-  inputsection.appendChild(input);
+  inputSection.appendChild(input);
 
   /* LIST OF IMAGES*/
-  const listsection = document.createElement("div");
-  listsection.className = "section";
+  const listSection = document.createElement("div");
+  listSection.className = "section";
+  listSection.id = "image-list";
+  listSection.style.display = "none";
 
-  const todo = document.createElement("div");
-  todo.className = "image-item";
+  /*const todo = document.createElement("div");
+  todo.className = "image-text-item";
 
   // Empty menu icon
   const emptyMenuIcon2 = document.createElement("div");
@@ -80,11 +86,11 @@ function createMenuPanel() {
 
   todo.appendChild(document.createTextNode("To do..."));
 
-  listsection.appendChild(todo);
+  listSection.appendChild(todo);*/
 
   /* ADDING EVERYTHING */
-  wrapper.appendChild(inputsection);
-  wrapper.appendChild(listsection);
+  wrapper.appendChild(inputSection);
+  wrapper.appendChild(listSection);
   div.appendChild(wrapper);
   document.body.appendChild(div);
 
@@ -130,6 +136,33 @@ function createMenuOption() {
   return div;
 }
 
+function createMenuImageSection(imageData) {
+  const details = document.createElement("details");
+  details.className = "image-item";
+
+  const summary = document.createElement("summary");
+  summary.textContent = displayedImageNames[displayedImageNames.length - 1];
+
+  const previewWrapper = document.createElement("div");
+  previewWrapper.className = "preview-wrapper";
+
+  const preview = document.createElement("img");
+  preview.src = imageData;
+  preview.className = "image-preview";
+  previewWrapper.appendChild(preview);
+  details.appendChild(previewWrapper);
+
+  const size = document.createElement("div");
+  details.appendChild(size);
+
+  const position = document.createElement("div");
+  details.appendChild(position);
+
+  details.appendChild(summary);
+
+  return details;
+}
+
 function loadImage(e) {
   toggleMenu();
   const file = e.target.files[0];
@@ -147,8 +180,11 @@ function loadImage(e) {
     if (previousImages) {
       bgElement.style.backgroundImage = `${previousImages}, url('${fileReader.result}')`;
     } else {
+      document.getElementById("image-list").style.display = "block";
       bgElement.style.backgroundImage = `url('${fileReader.result}')`;
     }
+    const div = createMenuImageSection(fileReader.result);
+    document.getElementById("image-list").appendChild(div);
     updateImages();
   };
 }
