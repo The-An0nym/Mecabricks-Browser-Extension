@@ -111,3 +111,7 @@ a > .notifications {
   width: 30px;
   display: inline-block;
 }
+
+.ui-margin-top-5 {
+  margin-top: 5px;
+}

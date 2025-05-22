@@ -1,11 +1,7 @@
 // ToDo ::
 // Generate dynamic list of already added images -> Consider using JSON
-// Implement removing images (and updating everything consequently)
-// Implement hiding images
-// Finish creating sliders -> Also make sure all event listeners can be removed properly (if needed)
-// - Control input
-// - Select text within input
-// - Bug testing!!
+// Clean and optimize code
+// Removing images?
 
 if (url.includes("workshop")) appendContent();
 
@@ -72,6 +68,7 @@ function createMenuPanel() {
   const input = document.createElement("input");
   input.id = "image-input";
   input.type = "file";
+  input.accept = ".png, .jpeg, .jpg, .gif";
   input.addEventListener("change", loadImage);
 
   inputSection.appendChild(input);
@@ -93,9 +90,9 @@ function createMenuPanel() {
   return div;
 }
 
-function createSlider(name, val, min, max, step, callback) {
+function createSlider(name, val, min, max, step, callBack, index) {
   const div = document.createElement("div");
-  div.className = "ui-number-wrapper ui-position-single";
+  div.className = "ui-number-wrapper ui-position-single ui-margin-top-5";
   div.style.width = "100%";
 
   const numberSliderWrapper = document.createElement("div");
@@ -144,44 +141,65 @@ function createSlider(name, val, min, max, step, callback) {
 
   div.appendChild(input);
 
-  arrowLeft.addEventListener("mouseup", incVal);
-  arrowLeft.step = -1;
-  arrowLeft.min = min;
-  arrowLeft.max = max;
-  arrowLeft.valEle = numberValue;
-  arrowRight.addEventListener("mouseup", incVal);
-  arrowRight.step = 1;
-  arrowRight.min = min;
-  arrowRight.max = max;
-  arrowRight.valEle = numberValue;
-  numberSlider.addEventListener("mousedown", horizontalMouseDrag); // START
-  document.addEventListener("mouseup", horizontalMouseDrag); // STOP*/
-  numberSlider.step = 1;
-  numberSlider.min = min;
-  numberSlider.max = max;
-  numberSlider.valEle = numberValue;
+  numberValue.min = min;
+  numberValue.max = max;
   numberValue.inp = input;
+  numberValue.numberSlider = numberSlider;
   numberValue.moved = false;
   numberValue.mouseDown = false;
+  numberValue.callBack = callBack;
+  numberValue.index = index;
+
+  numberSlider.valEle = numberValue;
+  input.valEle = numberValue;
+
+  arrowLeft.addEventListener("mouseup", incVal);
+  arrowLeft.valEle = numberValue;
+  arrowLeft.step = -step;
+  arrowRight.addEventListener("mouseup", incVal);
+  arrowRight.valEle = numberValue;
+  arrowRight.step = step;
+
+  numberSlider.addEventListener("mousedown", horizontalMouseDrag); // START
+  document.addEventListener("mouseup", horizontalMouseDrag); // STOP*/
 
   return div;
 }
 
 function incVal(e) {
-  const valEle = e.target.valEle;
-  const min = e.target.min;
-  const max = e.target.max;
-  const step = e.target.step;
+  let tar = e.target;
+  if (tar.tagName === "use") tar = tar.parentNode; // In case the path is selected
+  const valEle = tar.valEle;
+  const step = tar.step;
+  const min = valEle.min;
+  const max = valEle.max;
 
   const val = isNaN(valEle.textContent) ? false : parseInt(valEle.textContent);
   if (!val) return;
   if (val + step > max || val + step < min) return;
 
   valEle.textContent = val + step;
+  valEle.callBack(valEle);
 }
 
-function hideSelf(e) {
-  e.target.style.display = "none";
+function updateValueFromSlider(valEle, val) {
+  if (isNaN(val)) return;
+  val = parseInt(val);
+  const max = valEle.max;
+  const min = valEle.min;
+  if (val > max) val = max;
+  if (val < min) val = min;
+  valEle.textContent = val;
+  valEle.callBack(valEle);
+}
+
+function hideInput(e) {
+  if (e.type === "keydown") {
+    if (e.keyCode !== 13) return;
+  }
+  const inp = e.target;
+  inp.style.display = "none";
+  updateValueFromSlider(inp.valEle, inp.value);
 }
 
 function horizontalMouseDrag(e) {
@@ -190,25 +208,26 @@ function horizontalMouseDrag(e) {
     if (document.valEle) valEle = document.valEle;
     else return;
   }
-  valEle.inp.removeEventListener("focusout", hideSelf);
+  valEle.inp.removeEventListener("focusout", hideInput);
+  valEle.inp.removeEventListener("keydown", hideInput);
   if (e.type === "mousedown") {
     valEle.mouseDown = true;
     document.valEle = valEle;
     valEle.startX = e.clientX;
     valEle.iniVal = parseInt(valEle.textContent);
     document.valEle = valEle;
-    console.log("adding!");
     document.addEventListener("mousemove", mouseTracker);
   } else if (valEle.mouseDown) {
     valEle.mouseDown = false;
     if (!valEle.moved) {
       valEle.inp.style.display = "block";
-      valEle.inp.addEventListener("focusout", hideSelf);
+      valEle.inp.addEventListener("focusout", hideInput);
+      valEle.inp.addEventListener("keydown", hideInput);
       valEle.inp.value = valEle.textContent;
       valEle.inp.focus();
+      valEle.inp.select();
     }
     valEle.moved = false;
-    console.log("removing!");
     document.removeEventListener("mousemove", mouseTracker);
   }
 }
@@ -221,12 +240,8 @@ function mouseTracker(e) {
   }
   const startX = valEle.startX;
   const iniVal = valEle.iniVal;
-  const max = valEle.parentNode.max;
-  const min = valEle.parentNode.min;
-  let newValue = iniVal + Math.round((startX - e.clientX) / -3);
-  if (newValue > max) newValue = max;
-  if (newValue < min) newValue = min;
-  valEle.textContent = newValue;
+  let val = iniVal + Math.round((startX - e.clientX) / -3);
+  updateValueFromSlider(valEle, val);
 }
 
 function createMenuOption() {
@@ -279,6 +294,8 @@ function createMenuImageSection(imageData) {
   const summary = document.createElement("summary");
   summary.textContent = imageName;
 
+  details.appendChild(summary);
+
   // PREVIEW
   const previewWrapper = document.createElement("div");
   previewWrapper.className = "preview-wrapper";
@@ -290,72 +307,15 @@ function createMenuImageSection(imageData) {
   details.appendChild(previewWrapper);
 
   // SIZE
-  /*const size = document.createElement("div");
-
-  const sizeLabel = document.createElement("label");
-  sizeLabel.for = "size-" + imageIndex;
-  sizeLabel.textContent = "Size: ";
-  sizeLabel.className = "slider-label";
-
-  const sizeSlider = document.createElement("input");
-  sizeSlider.type = "range";
-  sizeSlider.min = "30";
-  sizeSlider.max = "100";
-  sizeSlider.value = imageSize;
-  sizeSlider.step = "2";
-  sizeSlider.id = "sizeSlider-" + imageIndex;
-  sizeSlider.addEventListener("input", changeSize);
-
-  size.appendChild(sizeLabel);
-  size.appendChild(sizeSlider);
-
-  details.appendChild(size);*/
-
-  const size = createSlider("Size", 30, 30, 100, 2, changeSize);
+  const size = createSlider("Size", 30, 30, 100, 1, changeSize, imageIndex);
   details.appendChild(size);
 
-  // POSITION X
-  const posX = document.createElement("div");
-
-  const posXLabel = document.createElement("label");
-  posXLabel.for = "posXSlider-" + imageIndex;
-  posXLabel.textContent = "X: ";
-  posXLabel.className = "slider-label";
-
-  const posXSlider = document.createElement("input");
-  posXSlider.type = "range";
-  posXSlider.min = "0";
-  posXSlider.max = "100";
-  posXSlider.step = "2";
-  posXSlider.value = imageXPos;
-  posXSlider.id = "posXSlider-" + imageIndex;
-  posXSlider.addEventListener("input", changeXPos);
-
-  posX.appendChild(posXLabel);
-  posX.appendChild(posXSlider);
-
+  // X
+  const posX = createSlider("X", 0, 0, 100, 1, changeXPos, imageIndex);
   details.appendChild(posX);
 
-  // POSITION Y
-  const posY = document.createElement("div");
-
-  const posYLabel = document.createElement("label");
-  posYLabel.for = "posYSlider-" + imageIndex;
-  posYLabel.textContent = "Y: ";
-  posYLabel.className = "slider-label";
-
-  const posYSlider = document.createElement("input");
-  posYSlider.type = "range";
-  posYSlider.min = "0";
-  posYSlider.max = "100";
-  posYSlider.step = "2";
-  posYSlider.value = imageYPos;
-  posYSlider.id = "posYSlider-" + imageIndex;
-  posYSlider.addEventListener("input", changeYPos);
-
-  posY.appendChild(posYLabel);
-  posY.appendChild(posYSlider);
-
+  // Y
+  const posY = createSlider("Y", 0, 0, 100, 1, changeYPos, imageIndex);
   details.appendChild(posY);
 
   return details;
@@ -364,6 +324,9 @@ function createMenuImageSection(imageData) {
 function loadImage(e) {
   toggleMenu();
   const file = e.target.files[0];
+
+  const ext = file.name.split(".").pop();
+  if (!["jpg, jpeg, png, gif"].includes(ext)) return;
 
   const bgElement = document.querySelector(
     "#workbench > div.viewport > div.scene > canvas"
@@ -399,26 +362,32 @@ function updateImages() {
   bgElement.style.backgroundPositionY = `${imagePositionsY.join("%, ")}%`;
 }
 
-function changeSize(e) {
-  index = e.target.id.split("-")[1];
-  if (isNaN(index)) return;
+function changeSize(val) {
+  let index = val.index;
+  let value = val.textContent;
+  if (isNaN(index) || isNaN(value)) return;
   index = parseInt(index);
-  displayedImageSizes[index] = e.target.value;
+  value = parseInt(value);
+  displayedImageSizes[index] = value;
   updateImages();
 }
 
-function changeXPos(e) {
-  index = e.target.id.split("-")[1];
-  if (isNaN(index)) return;
+function changeXPos(val) {
+  let index = val.index;
+  let value = val.textContent;
+  if (isNaN(index) || isNaN(value)) return;
   index = parseInt(index);
-  imagePositionsX[index] = e.target.value;
+  value = parseInt(value);
+  imagePositionsX[index] = value;
   updateImages();
 }
 
-function changeYPos(e) {
-  index = e.target.id.split("-")[1];
-  if (isNaN(index)) return;
+function changeYPos(val) {
+  let index = val.index;
+  let value = val.textContent;
+  if (isNaN(index) || isNaN(value)) return;
   index = parseInt(index);
-  imagePositionsY[index] = e.target.value;
+  value = parseInt(value);
+  imagePositionsY[index] = value;
   updateImages();
 }
