@@ -326,7 +326,7 @@ function loadImage(e) {
   const file = e.target.files[0];
 
   const ext = file.name.split(".").pop();
-  if (!["jpg, jpeg, png, gif"].includes(ext)) return;
+  if (!["jpg", "jpeg", "png", "gif"].includes(ext)) return;
 
   const bgElement = document.querySelector(
     "#workbench > div.viewport > div.scene > canvas"
