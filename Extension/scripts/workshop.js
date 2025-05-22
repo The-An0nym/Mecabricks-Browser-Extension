@@ -325,8 +325,10 @@ function loadImage(e) {
   toggleMenu();
   const file = e.target.files[0];
 
-  const ext = file.name.split(".").pop();
+  const sep = file.name.split(".");
+  const ext = sep.pop();
   if (!["jpg", "jpeg", "png", "gif"].includes(ext)) return;
+  const name = sep.join(".");
 
   const bgElement = document.querySelector(
     "#workbench > div.viewport > div.scene > canvas"
@@ -335,7 +337,7 @@ function loadImage(e) {
   let fileReader = new FileReader();
   fileReader.readAsDataURL(file);
   fileReader.onload = function () {
-    displayedImageNames.push(file.name);
+    displayedImageNames.push(name);
     displayedImageSizes.push(30);
     imagePositionsX.push(0);
     imagePositionsY.push(0);
