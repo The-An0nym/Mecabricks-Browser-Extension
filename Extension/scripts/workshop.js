@@ -1,7 +1,11 @@
 // ToDo ::
-// Generate dynamic list of already added images -> Consider using JSOn
-// Implement altering images
+// Generate dynamic list of already added images -> Consider using JSON
 // Implement removing images (and updating everything consequently)
+// Implement hiding images
+// Finish creating sliders -> Also make sure all event listeners can be removed properly (if needed)
+// - Control input
+// - Select text within input
+// - Bug testing!!
 
 if (url.includes("workshop")) appendContent();
 
@@ -89,6 +93,142 @@ function createMenuPanel() {
   return div;
 }
 
+function createSlider(name, val, min, max, step, callback) {
+  const div = document.createElement("div");
+  div.className = "ui-number-wrapper ui-position-single";
+  div.style.width = "100%";
+
+  const numberSliderWrapper = document.createElement("div");
+  div.class = "ui-number-std";
+
+  const arrowLeft = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "svg"
+  );
+  arrowLeft.setAttribute("class", "ui-number-arrow ui-number-arrow-left");
+  arrowLeft.innerHTML =
+    '<symbol id="arrow-196f33f5d09" viewBox="0 0 21 32"><path d="M12.88 10.88v10.32l-5.28-5.2z"></path></symbol><use xlink:href="#arrow-196f33f5d09"></use>';
+
+  numberSliderWrapper.appendChild(arrowLeft);
+
+  const numberSlider = document.createElement("div");
+  numberSlider.className = "ui-number-slider custom-slider";
+  numberSlider.style.width = "calc(100% - 26px)";
+
+  const numberText = document.createElement("div");
+  numberText.className = "ui-number-text";
+  numberText.textContent = name;
+  numberSlider.appendChild(numberText);
+
+  const numberValue = document.createElement("div");
+  numberValue.className = "ui-number-value";
+  numberValue.textContent = val;
+  numberSlider.appendChild(numberValue);
+
+  numberSliderWrapper.appendChild(numberSlider);
+
+  const arrowRight = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "svg"
+  );
+  arrowRight.setAttribute("class", "ui-number-arrow ui-number-arrow-right");
+  arrowRight.innerHTML = '<use xlink:href="#arrow-196f33f5d09"></use>';
+  numberSliderWrapper.appendChild(arrowRight);
+
+  div.appendChild(numberSliderWrapper);
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "ui-input ui-number-input";
+  input.style.display = "none";
+
+  div.appendChild(input);
+
+  arrowLeft.addEventListener("mouseup", incVal);
+  arrowLeft.step = -1;
+  arrowLeft.min = min;
+  arrowLeft.max = max;
+  arrowLeft.valEle = numberValue;
+  arrowRight.addEventListener("mouseup", incVal);
+  arrowRight.step = 1;
+  arrowRight.min = min;
+  arrowRight.max = max;
+  arrowRight.valEle = numberValue;
+  numberSlider.addEventListener("mousedown", horizontalMouseDrag); // START
+  document.addEventListener("mouseup", horizontalMouseDrag); // STOP*/
+  numberSlider.step = 1;
+  numberSlider.min = min;
+  numberSlider.max = max;
+  numberSlider.valEle = numberValue;
+  numberValue.inp = input;
+  numberValue.moved = false;
+  numberValue.mouseDown = false;
+
+  return div;
+}
+
+function incVal(e) {
+  const valEle = e.target.valEle;
+  const min = e.target.min;
+  const max = e.target.max;
+  const step = e.target.step;
+
+  const val = isNaN(valEle.textContent) ? false : parseInt(valEle.textContent);
+  if (!val) return;
+  if (val + step > max || val + step < min) return;
+
+  valEle.textContent = val + step;
+}
+
+function hideSelf(e) {
+  e.target.style.display = "none";
+}
+
+function horizontalMouseDrag(e) {
+  let valEle = e.target.valEle;
+  if (!valEle) {
+    if (document.valEle) valEle = document.valEle;
+    else return;
+  }
+  valEle.inp.removeEventListener("focusout", hideSelf);
+  if (e.type === "mousedown") {
+    valEle.mouseDown = true;
+    document.valEle = valEle;
+    valEle.startX = e.clientX;
+    valEle.iniVal = parseInt(valEle.textContent);
+    document.valEle = valEle;
+    console.log("adding!");
+    document.addEventListener("mousemove", mouseTracker);
+  } else if (valEle.mouseDown) {
+    valEle.mouseDown = false;
+    if (!valEle.moved) {
+      valEle.inp.style.display = "block";
+      valEle.inp.addEventListener("focusout", hideSelf);
+      valEle.inp.value = valEle.textContent;
+      valEle.inp.focus();
+    }
+    valEle.moved = false;
+    console.log("removing!");
+    document.removeEventListener("mousemove", mouseTracker);
+  }
+}
+
+function mouseTracker(e) {
+  const valEle = document.valEle;
+  if (!valEle.moved) {
+    if (e.startX !== e.clientX) valEle.moved = true;
+    else return;
+  }
+  const startX = valEle.startX;
+  const iniVal = valEle.iniVal;
+  const max = valEle.parentNode.max;
+  const min = valEle.parentNode.min;
+  let newValue = iniVal + Math.round((startX - e.clientX) / -3);
+  if (newValue > max) newValue = max;
+  if (newValue < min) newValue = min;
+  valEle.textContent = newValue;
+}
+
 function createMenuOption() {
   const toolbar = document.getElementById("toolbar-top");
   const div = document.createElement("div");
@@ -150,7 +290,7 @@ function createMenuImageSection(imageData) {
   details.appendChild(previewWrapper);
 
   // SIZE
-  const size = document.createElement("div");
+  /*const size = document.createElement("div");
 
   const sizeLabel = document.createElement("label");
   sizeLabel.for = "size-" + imageIndex;
@@ -169,6 +309,9 @@ function createMenuImageSection(imageData) {
   size.appendChild(sizeLabel);
   size.appendChild(sizeSlider);
 
+  details.appendChild(size);*/
+
+  const size = createSlider("Size", 30, 30, 100, 2, changeSize);
   details.appendChild(size);
 
   // POSITION X
@@ -230,7 +373,7 @@ function loadImage(e) {
   fileReader.readAsDataURL(file);
   fileReader.onload = function () {
     displayedImageNames.push(file.name);
-    displayedImageSizes.push(25);
+    displayedImageSizes.push(30);
     imagePositionsX.push(0);
     imagePositionsY.push(0);
     const previousImages = bgElement.style.backgroundImage;
