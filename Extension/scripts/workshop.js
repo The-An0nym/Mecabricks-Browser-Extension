@@ -1,14 +1,12 @@
 // ToDo ::
-// Generate dynamic list of already added images -> Consider using JSON
 // Clean and optimize code
 // Removing images?
+// Fix keydown bug ->
+// Why does keydown call the callback twice? Is it also calling something else?
 
 if (url.includes("workshop")) appendContent();
 
-const displayedImageNames = [];
-const displayedImageSizes = [];
-const imagePositionsX = [];
-const imagePositionsY = [];
+const imgsList = [];
 
 function appendContent() {
   menuOption = createMenuOption();
@@ -282,11 +280,8 @@ function createMenuOption() {
 }
 
 function createMenuImageSection(imageData) {
-  const imageIndex = displayedImageSizes.length - 1;
-  const imageName = displayedImageNames[imageIndex];
-  const imageSize = displayedImageSizes[imageIndex];
-  const imageXPos = imagePositionsX[imageIndex];
-  const imageYPos = imagePositionsY[imageIndex];
+  const index = imgsList.length - 1;
+  const imageName = imgsList[index].name;
 
   const details = document.createElement("details");
   details.className = "image-item";
@@ -306,16 +301,46 @@ function createMenuImageSection(imageData) {
   previewWrapper.appendChild(preview);
   details.appendChild(previewWrapper);
 
+  // HIDE
+
+  const checkBoxWrapper = document.createElement("div");
+  checkBoxWrapper.className = "ui-checkbox-wrapper";
+  checkBoxWrapper.style.width = "100%";
+
+  const randomID = Math.round(Math.random() * 1000);
+
+  const checkBoxInp = document.createElement("input");
+  checkBoxInp.type = "checkbox";
+  checkBoxInp.id = "checkbox-c-" + randomID;
+  checkBoxInp.className = "ui-checkbox-input";
+  checkBoxInp.index = index;
+  checkBoxInp.addEventListener("change", toggleImageVisibility);
+
+  checkBoxWrapper.appendChild(checkBoxInp);
+
+  const checkBoxLabel = document.createElement("label");
+  checkBoxLabel.setAttribute("for", "checkbox-c-" + randomID);
+
+  checkBoxLabel.innerHTML =
+    '<svg class="ui-checkbox ui-checkbox-right"><symbol id="tick-196fd42c562" viewBox="0 0 32 32"><path d="M27 4l-15 15-7-7-5 5 12 12 20-20z"></path></symbol><use xlink:href="#tick-196fd42c562"></use></svg>';
+
+  const checkBoxText = document.createElement("span");
+  checkBoxText.textContent = "Hide";
+
+  checkBoxLabel.appendChild(checkBoxText);
+  checkBoxWrapper.appendChild(checkBoxLabel);
+  details.appendChild(checkBoxWrapper);
+
   // SIZE
-  const size = createSlider("Size", 30, 30, 100, 1, changeSize, imageIndex);
+  const size = createSlider("Size", 30, 30, 300, 1, changeSize, index);
   details.appendChild(size);
 
   // X
-  const posX = createSlider("X", 0, 0, 100, 1, changeXPos, imageIndex);
+  const posX = createSlider("X", 25, 0, 100, 1, changeXPos, index);
   details.appendChild(posX);
 
   // Y
-  const posY = createSlider("Y", 0, 0, 100, 1, changeYPos, imageIndex);
+  const posY = createSlider("Y", 25, 0, 100, 1, changeYPos, index);
   details.appendChild(posY);
 
   return details;
@@ -334,23 +359,34 @@ function loadImage(e) {
     "#workbench > div.viewport > div.scene > canvas"
   );
 
-  let fileReader = new FileReader();
-  fileReader.readAsDataURL(file);
-  fileReader.onload = function () {
-    displayedImageNames.push(name);
-    displayedImageSizes.push(30);
-    imagePositionsX.push(0);
-    imagePositionsY.push(0);
-    const previousImages = bgElement.style.backgroundImage;
-    if (previousImages) {
-      bgElement.style.backgroundImage = `${previousImages}, url('${fileReader.result}')`;
-    } else {
-      document.getElementById("image-list").style.display = "block";
-      bgElement.style.backgroundImage = `url('${fileReader.result}')`;
-    }
-    const div = createMenuImageSection(fileReader.result);
-    document.getElementById("image-list").appendChild(div);
-    updateImages();
+  let fR = new FileReader();
+  fR.readAsDataURL(file);
+  fR.onload = function () {
+    var img = new Image();
+
+    img.src = fR.result;
+
+    img.onload = function () {
+      const index = imgsList.length;
+      imgsList.push({});
+      imgsList[index].name = name;
+      imgsList[index].size = 30;
+      imgsList[index].x = 25;
+      imgsList[index].y = 25;
+      imgsList[index].ratio = img.height / img.width;
+      imgsList[index].hide = false;
+
+      const previousImages = bgElement.style.backgroundImage;
+      if (previousImages) {
+        bgElement.style.backgroundImage = `${previousImages}, url('${img.src}')`;
+      } else {
+        document.getElementById("image-list").style.display = "block";
+        bgElement.style.backgroundImage = `url('${img.src}')`;
+      }
+      const div = createMenuImageSection(img.src);
+      document.getElementById("image-list").appendChild(div);
+      updateImages();
+    };
   };
 }
 
@@ -359,9 +395,35 @@ function updateImages() {
     "#workbench > div.viewport > div.scene > canvas"
   );
 
-  bgElement.style.backgroundSize = `${displayedImageSizes.join("%, ")}%`;
-  bgElement.style.backgroundPositionX = `${imagePositionsX.join("%, ")}%`;
-  bgElement.style.backgroundPositionY = `${imagePositionsY.join("%, ")}%`;
+  const cHeight = parseInt(
+    document.querySelector("div.scene > canvas").style.height.slice(0, -2)
+  );
+  const cWidth = parseInt(
+    document.querySelector("div.scene > canvas").style.width.slice(0, -2)
+  );
+
+  const size = [];
+  const xPos = [];
+  const yPos = [];
+
+  imgsList.forEach((i) => {
+    if (i.hide) size.push(0);
+    else size.push(i.size);
+    const iWidth = (cWidth / 100) * i.size;
+    xPos.push(((cWidth + iWidth - 20) / 100) * i.x - iWidth + 10);
+    const iHeight = (cWidth / 100) * i.size * i.ratio;
+    yPos.push(((cHeight + iHeight - 20) / 100) * i.y - iHeight + 10);
+  });
+
+  if (size.length === 0) {
+    bgElement.style.backgroundSize = "";
+    bgElement.style.backgroundPositionX = "";
+    bgElement.style.backgroundPositionY = "";
+  } else {
+    bgElement.style.backgroundSize = `${size.join("%, ")}%`;
+    bgElement.style.backgroundPositionX = `${xPos.join("px, ")}px`;
+    bgElement.style.backgroundPositionY = `${yPos.join("px, ")}px`;
+  }
 }
 
 function changeSize(val) {
@@ -370,7 +432,7 @@ function changeSize(val) {
   if (isNaN(index) || isNaN(value)) return;
   index = parseInt(index);
   value = parseInt(value);
-  displayedImageSizes[index] = value;
+  imgsList[index].size = value;
   updateImages();
 }
 
@@ -380,7 +442,7 @@ function changeXPos(val) {
   if (isNaN(index) || isNaN(value)) return;
   index = parseInt(index);
   value = parseInt(value);
-  imagePositionsX[index] = value;
+  imgsList[index].x = value;
   updateImages();
 }
 
@@ -390,6 +452,13 @@ function changeYPos(val) {
   if (isNaN(index) || isNaN(value)) return;
   index = parseInt(index);
   value = parseInt(value);
-  imagePositionsY[index] = value;
+  imgsList[index].y = value;
+  updateImages();
+}
+
+function toggleImageVisibility(e) {
+  if (e.target.index === undefined) return;
+  index = e.target.index;
+  imgsList[index].hide = !imgsList[index].hide;
   updateImages();
 }
