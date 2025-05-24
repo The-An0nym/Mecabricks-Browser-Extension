@@ -1,8 +1,6 @@
 // ToDo ::
 // Clean and optimize code
-// Removing images?
-// Fix keydown bug ->
-// Why does keydown call the callback twice? Is it also calling something else?
+// Removing images
 
 if (url.includes("workshop")) appendContent();
 
@@ -88,10 +86,10 @@ function createMenuPanel() {
   return div;
 }
 
-function createSlider(name, val, min, max, step, callBack, index) {
+function createSlider(name, val, min, max, step, sensitivity, callBack, index) {
   const div = document.createElement("div");
   div.className = "ui-number-wrapper ui-position-single ui-margin-top-5";
-  div.style.width = "100%";
+  div.style.width = "calc(100% - 15px)";
 
   const numberSliderWrapper = document.createElement("div");
   div.class = "ui-number-std";
@@ -139,6 +137,7 @@ function createSlider(name, val, min, max, step, callBack, index) {
 
   div.appendChild(input);
 
+  numberValue.sensitivity = sensitivity;
   numberValue.min = min;
   numberValue.max = max;
   numberValue.inp = input;
@@ -172,8 +171,8 @@ function incVal(e) {
   const min = valEle.min;
   const max = valEle.max;
 
-  const val = isNaN(valEle.textContent) ? false : parseInt(valEle.textContent);
-  if (!val) return;
+  if (isNaN(valEle.textContent)) return;
+  val = parseInt(valEle.textContent);
   if (val + step > max || val + step < min) return;
 
   valEle.textContent = val + step;
@@ -195,7 +194,10 @@ function hideInput(e) {
   if (e.type === "keydown") {
     if (e.keyCode !== 13) return;
   }
+
   const inp = e.target;
+  inp.removeEventListener("focusout", hideInput);
+  inp.removeEventListener("keydown", hideInput);
   inp.style.display = "none";
   updateValueFromSlider(inp.valEle, inp.value);
 }
@@ -206,14 +208,11 @@ function horizontalMouseDrag(e) {
     if (document.valEle) valEle = document.valEle;
     else return;
   }
-  valEle.inp.removeEventListener("focusout", hideInput);
-  valEle.inp.removeEventListener("keydown", hideInput);
   if (e.type === "mousedown") {
     valEle.mouseDown = true;
     document.valEle = valEle;
     valEle.startX = e.clientX;
     valEle.iniVal = parseInt(valEle.textContent);
-    document.valEle = valEle;
     document.addEventListener("mousemove", mouseTracker);
   } else if (valEle.mouseDown) {
     valEle.mouseDown = false;
@@ -238,7 +237,8 @@ function mouseTracker(e) {
   }
   const startX = valEle.startX;
   const iniVal = valEle.iniVal;
-  let val = iniVal + Math.round((startX - e.clientX) / -3);
+  const sensitivity = valEle.sensitivity;
+  let val = iniVal + Math.round((startX - e.clientX) / -sensitivity);
   updateValueFromSlider(valEle, val);
 }
 
@@ -285,6 +285,7 @@ function createMenuImageSection(imageData) {
 
   const details = document.createElement("details");
   details.className = "image-item";
+  details.id = "image-" + index;
 
   const summary = document.createElement("summary");
   summary.textContent = imageName;
@@ -302,10 +303,9 @@ function createMenuImageSection(imageData) {
   details.appendChild(previewWrapper);
 
   // HIDE
-
   const checkBoxWrapper = document.createElement("div");
   checkBoxWrapper.className = "ui-checkbox-wrapper";
-  checkBoxWrapper.style.width = "100%";
+  checkBoxWrapper.style.width = "calc(100% - 15px)";
 
   const randomID = Math.round(Math.random() * 1000);
 
@@ -332,21 +332,38 @@ function createMenuImageSection(imageData) {
   details.appendChild(checkBoxWrapper);
 
   // SIZE
-  const size = createSlider("Size", 30, 30, 300, 1, changeSize, index);
+  const size = createSlider("Size", 30, 30, 300, 1, 2, changeSize, index);
   details.appendChild(size);
 
   // X
-  const posX = createSlider("X", 25, 0, 100, 1, changeXPos, index);
+  const posX = createSlider("X", 50, 0, 100, 1, 3, changeXPos, index);
   details.appendChild(posX);
 
   // Y
-  const posY = createSlider("Y", 25, 0, 100, 1, changeYPos, index);
+  const posY = createSlider("Y", 50, 0, 100, 1, 3, changeYPos, index);
   details.appendChild(posY);
+
+  // DELETE
+  const removeWrapper = document.createElement("div");
+  removeWrapper.className = "ui-button-wrapper ui-position-single";
+  removeWrapper.style.textAlign = "center";
+  removeWrapper.style.width = "calc(100% - 15px)";
+  removeWrapper.style.marginTop = "15px";
+  removeWrapper.addEventListener("mouseup", removeImage);
+  removeWrapper.index = index;
+
+  const removeText = document.createElement("div");
+  removeText.className = "ui-button-text";
+  removeText.textContent = "Remove";
+
+  removeWrapper.appendChild(removeText);
+  details.appendChild(removeWrapper);
 
   return details;
 }
 
 function loadImage(e) {
+  if (!e.target.files.length) return;
   toggleMenu();
   const file = e.target.files[0];
 
@@ -371,8 +388,8 @@ function loadImage(e) {
       imgsList.push({});
       imgsList[index].name = name;
       imgsList[index].size = 30;
-      imgsList[index].x = 25;
-      imgsList[index].y = 25;
+      imgsList[index].x = 50;
+      imgsList[index].y = 50;
       imgsList[index].ratio = img.height / img.width;
       imgsList[index].hide = false;
 
@@ -386,6 +403,8 @@ function loadImage(e) {
       const div = createMenuImageSection(img.src);
       document.getElementById("image-list").appendChild(div);
       updateImages();
+
+      e.target.value = "";
     };
   };
 }
@@ -460,5 +479,23 @@ function toggleImageVisibility(e) {
   if (e.target.index === undefined) return;
   index = e.target.index;
   imgsList[index].hide = !imgsList[index].hide;
+  updateImages();
+}
+
+function removeImage(e) {
+  let index;
+  if (e.target.index === undefined) index = e.target.parentNode.index;
+  else index = e.target.index;
+  imgsList.splice(index, 1);
+  const bgElement = document.querySelector(
+    "#workbench > div.viewport > div.scene > canvas"
+  );
+
+  const previousImages = bgElement.style.backgroundImage.split(", ");
+  previousImages.splice(index, 1);
+  bgElement.style.backgroundImage = previousImages.join(", ");
+  document.getElementById("image-" + index).remove();
+  if (imgsList.length === 0)
+    document.getElementById("image-list").style.display = "none";
   updateImages();
 }
