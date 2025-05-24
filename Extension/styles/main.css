@@ -79,6 +79,9 @@ a > .notifications {
   font-size: 12px;
   line-height: 20px;
   margin-bottom: 5px;
+}
+
+.image-item > summary {
   cursor: pointer;
 }
 
