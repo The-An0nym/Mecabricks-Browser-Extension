@@ -110,7 +110,7 @@ if (["models", "topic", "category", "messages"].some((s) => url.includes(s))) {
 }
 
 // For model editor
-(function () {
+function privateLibraryObserver() {
   // Select the node that will be observed for mutations
   const targetNode = document.getElementById("gallery-content");
 
@@ -134,4 +134,6 @@ if (["models", "topic", "category", "messages"].some((s) => url.includes(s))) {
 
   // Start observing the target node for configured mutations
   observer.observe(targetNode, config);
-})();
+}
+
+if (url.includes("account/library")) privateLibraryObserver;
