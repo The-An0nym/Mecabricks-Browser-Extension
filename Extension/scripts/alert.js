@@ -1,11 +1,4 @@
-// Select the node that will be observed for mutations
-const targetNode = document.body;
-
-// Options for the observer (which mutations to observe)
-const config = { childList: true };
-
-// Callback function to execute when mutations are observed
-const tryRemoval = (mutationList, observer) => {
+function tryRemoval(mutationList) {
   for (const mutation of mutationList) {
     if (mutation.type === "childList") {
       const overlay = document.querySelector(
@@ -14,12 +7,12 @@ const tryRemoval = (mutationList, observer) => {
       if (overlay) {
         overlay.style.height = "0%"; // Hide the overlay
       }
+      break;
     }
   }
-};
+}
 
-// Create an observer instance linked to the callback function
+const targetNode = document.body;
+const config = { childList: true };
 const observer = new MutationObserver(tryRemoval);
-
-// Start observing the target node for configured mutations
 observer.observe(targetNode, config);

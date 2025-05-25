@@ -38,23 +38,26 @@ chrome.storage.sync.get("hiddenUsers", (data) => {
   if (data.hiddenUsers.length === 0) {
     return;
   }
-  if (url.includes("models")) {
-    removeComments(data.hiddenUsers);
-  }
-  if (url.includes("topic")) {
-    removePosts(data.hiddenUsers);
-  }
-  if (url.includes("library")) {
-    removeModels(data.hiddenUsers);
-  }
-  if (url.includes("category")) {
-    removeThread(data.hiddenUsers);
-  }
-  if (url.includes("messages")) {
-    removeMessages(data.hiddenUsers);
-  }
-  if (url.includes("notifications")) {
-    removeNotifications(data.hiddenUsers);
+
+  if (url.includes("models")) removeComments(data.hiddenUsers);
+  else if (url.includes("topic")) removePosts(data.hiddenUsers);
+  else if (url.includes("library")) removeModels(data.hiddenUsers);
+  else if (url.includes("category")) removeThread(data.hiddenUsers);
+  else {
+    const config = { childList: true };
+    if (url.includes("messages")) {
+      const targetNode = document.getElementsByClassName("nano-content")[0];
+      const observer = new MutationObserver((e) => {
+        removeMessages(e, data.hiddenUsers);
+      });
+      observer.observe(targetNode, config);
+    } else if (url.includes("notifications")) {
+      const targetNode = document.getElementById("notifications");
+      const observer = new MutationObserver((e) => {
+        removeNotifications(e, data.hiddenUsers);
+      });
+      observer.observe(targetNode, config);
+    }
   }
 });
 
@@ -67,7 +70,12 @@ chrome.storage.sync.get("hiddenThreads", (data) => {
     return;
   }
   if (url.includes("notifications")) {
-    removeThreadNotifications(data.hiddenThreads);
+    const targetNode = document.getElementById("notifications");
+    const config = { childList: true };
+    const observer = new MutationObserver((e) => {
+      removeThreadNotifications(e, data.hiddenThreads);
+    });
+    observer.observe(targetNode, config);
   }
 });
 
@@ -111,138 +119,80 @@ function removeThread(users) {
   }
 }
 
-function removeMessages(users) {
-  let callOnce = false;
-
-  // Select the node that will be observed for mutations
-  const targetNode = document.getElementsByClassName("nano-content")[0];
-
-  // Options for the observer (which mutations to observe)
-  const config = { childList: true };
-
-  // Callback function to execute when mutations are observed
-  const remMessages = (mutationList, observer) => {
-    if (callOnce) return;
-    callOnce = true;
-    for (const mutation of mutationList) {
-      if (mutation.type === "childList") {
-        const items = document.getElementsByClassName("item");
-        if (items.length !== 0) {
-          for (let i = items.length - 1; i >= 0; i--) {
-            if (
-              users.includes(
-                items[i].getElementsByClassName("username")[0].innerText
-              )
-            ) {
-              items[i].remove();
-            }
+/* Mutation obs functions */
+function removeMessages(mutationList, users) {
+  for (const mutation of mutationList) {
+    if (mutation.type === "childList") {
+      const items = document.getElementsByClassName("item");
+      if (items.length !== 0) {
+        for (let i = items.length - 1; i >= 0; i--) {
+          if (
+            users.includes(
+              items[i].getElementsByClassName("username")[0].innerText
+            )
+          ) {
+            items[i].remove();
           }
-        } else {
-          callOnce = false;
         }
       }
+      break; // Ensures it only runs once
     }
-  };
-
-  // Create an observer instance linked to the callback function
-  const observer = new MutationObserver(remMessages);
-
-  // Start observing the target node for configured mutations
-  observer.observe(targetNode, config);
+  }
 }
 
-function removeNotifications(users) {
-  let callOnce = false;
-  const targetNode = document.getElementById("notifications");
-  const config = { childList: true };
+function removeNotifications(mutationList, users) {
+  for (const mutation of mutationList) {
+    if (mutation.type === "childList") {
+      const items = document.getElementsByClassName("notification");
+      if (items.length !== 0) {
+        for (let i = items.length - 1; i >= 0; i--) {
+          // PRIVATE MESSAGES
+          if (
+            items[i].getElementsByClassName("title")[0].innerText ===
+              "Private conversation" &&
+            users.includes(items[i].getElementsByClassName("user")[0].innerText)
+          ) {
+            items[i].remove();
 
-  // Callback function to execute when mutations are observed
-  const remNotifications = (mutationList, observer) => {
-    if (callOnce) return;
-    callOnce = true;
-    for (const mutation of mutationList) {
-      if (mutation.type === "childList") {
-        const items = document.getElementsByClassName("notification");
-        if (items.length !== 0) {
-          for (let i = items.length - 1; i >= 0; i--) {
-            // PRIVATE MESSAGES
-            if (
-              items[i].getElementsByClassName("title")[0].innerText ===
-                "Private conversation" &&
-              users.includes(
-                items[i].getElementsByClassName("user")[0].innerText
-              )
-            ) {
-              items[i].remove();
-
-              // MODELS
-            } else if (
-              items[i].getElementsByClassName("image-container").length === 1 &&
-              users.includes(
-                items[i].getElementsByClassName("user")[0].innerText
-              )
-            ) {
-              items[i].remove();
-              // SENDERS (in case of singular notifications, i.e. unique like or comment)
-            } else if (
-              users.includes(
-                items[i].querySelector(".senders > a").innerText
-              ) &&
-              items[i].querySelector(".senders").getElementsByTagName("a")
-                .length === 1
-            ) {
-              items[i].remove();
-            }
+            // MODELS
+          } else if (
+            items[i].getElementsByClassName("image-container").length === 1 &&
+            users.includes(items[i].getElementsByClassName("user")[0].innerText)
+          ) {
+            items[i].remove();
+            // SENDERS (in case of singular notifications, i.e. unique like or comment)
+          } else if (
+            users.includes(items[i].querySelector(".senders > a").innerText) &&
+            items[i].querySelector(".senders").getElementsByTagName("a")
+              .length === 1
+          ) {
+            items[i].remove();
           }
-        } else {
-          callOnce = false;
         }
       }
+      break; // Ensures it only runs once
     }
-  };
-
-  const observer = new MutationObserver(remNotifications);
-  observer.observe(targetNode, config);
+  }
 }
 
-function removeThreadNotifications(thread) {
-  let callOnce = false;
-
-  // Select the node that will be observed for mutations
-  const targetNode = document.getElementById("notifications");
-
-  // Options for the observer (which mutations to observe)
-  const config = { childList: true };
-
-  // Callback function to execute when mutations are observed
-  const remThreads = (mutationList, observer) => {
-    if (callOnce) return;
-    callOnce = true;
-    for (const mutation of mutationList) {
-      if (mutation.type === "childList") {
-        const items = document.getElementsByClassName("notification");
-        if (items.length !== 0) {
-          for (let i = items.length - 1; i >= 0; i--) {
-            // THREADS
-            if (
-              items[i].getElementsByClassName("icon-container").length === 1 &&
-              thread.includes(
-                items[i].getElementsByClassName("title")[0].innerText
-              )
-            ) {
-              items[i].remove();
-            }
+function removeThreadNotifications(mutationList, thread) {
+  for (const mutation of mutationList) {
+    if (mutation.type === "childList") {
+      const items = document.getElementsByClassName("notification");
+      if (items.length !== 0) {
+        for (let i = items.length - 1; i >= 0; i--) {
+          // THREADS
+          if (
+            items[i].getElementsByClassName("icon-container").length === 1 &&
+            thread.includes(
+              items[i].getElementsByClassName("title")[0].innerText
+            )
+          ) {
+            items[i].remove();
           }
-        } else {
-          callOnce = false;
         }
       }
+      break; // Ensures it only runs once
     }
-  };
-
-  // Create an observer instance linked to the callback function
-  const observer = new MutationObserver(remThreads);
-
-  // Start observing the target node for configured mutations
-  observer.observe(targetNode, config);
+  }
 }

@@ -110,30 +110,21 @@ if (["models", "topic", "category", "messages"].some((s) => url.includes(s))) {
 }
 
 // For model editor
-function privateLibraryObserver() {
-  // Select the node that will be observed for mutations
-  const targetNode = document.getElementById("gallery-content");
-
-  // Options for the observer (which mutations to observe)
-  const config = { childList: true };
-
-  // Callback function to execute when mutations are observed
-  const appendBBcode = (mutationList, observer) => {
-    for (const mutation of mutationList) {
-      if (mutation.type === "childList") {
-        const item = document.getElementById("properties");
-        if (item) {
-          setUpBBCodeFormatter(item.getElementsByTagName("textarea"));
-        }
+function privateLibrarySetup(mutationList) {
+  for (const mutation of mutationList) {
+    if (mutation.type === "childList") {
+      const item = document.getElementById("properties");
+      if (item) {
+        setUpBBCodeFormatter(item.getElementsByTagName("textarea"));
       }
+      break;
     }
-  };
-
-  // Create an observer instance linked to the callback function
-  const observer = new MutationObserver(appendBBcode);
-
-  // Start observing the target node for configured mutations
-  observer.observe(targetNode, config);
+  }
 }
 
-if (url.includes("account/library")) privateLibraryObserver;
+if (url.includes("account/library")) {
+  const config = { childList: true };
+  const targetNode = document.getElementById("gallery-content");
+  const observer = new MutationObserver(privateLibrarySetup);
+  observer.observe(targetNode, config);
+}
