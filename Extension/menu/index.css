@@ -109,25 +109,30 @@ input:checked + .slider:before {
   width: min-content;
 }
 
-#hidden-users {
+#hidden-users,
+#hidden-threads {
   display: none;
 }
 
-#users-wrapper {
+#users-wrapper,
+#threads-wrapper {
   display: flex;
   flex-direction: column;
   max-height: 70vh;
   overflow-y: scroll;
 }
 
-.hidden-user-wrapper {
+.hidden-user-wrapper,
+.hidden-thread-wrapper {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid black;
-  overflow-wrap: anywhere;
+  border-bottom: 1px solid #555;
 }
 
-/* WORKSHOP */
-#workshop-images {
-  display: none;
+.hidden-user-wrapper > span,
+.hidden-thread-wrapper > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 85%;
 }

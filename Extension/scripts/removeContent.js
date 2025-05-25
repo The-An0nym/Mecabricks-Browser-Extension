@@ -1,4 +1,4 @@
-// Check the toggle state and conditionally run the script
+// Hide deleted users
 chrome.storage.sync.get("hideDeletedUsers", (data) => {
   if (!data.hideDeletedUsers) {
     return;
@@ -11,7 +11,7 @@ chrome.storage.sync.get("hideDeletedUsers", (data) => {
   }
 });
 
-// Check the toggle state and conditionally run the script
+// Numbered notifications
 chrome.storage.sync.get("numberedNotifications", (data) => {
   if (data.numberedNotifications) {
     document.body.style.setProperty("--font-color", "white");
@@ -30,7 +30,7 @@ chrome.storage.sync.get("numberedNotifications", (data) => {
   }
 });
 
-// Get data
+// Hidden users
 chrome.storage.sync.get("hiddenUsers", (data) => {
   if (!data.hiddenUsers) {
     return;
@@ -55,6 +55,19 @@ chrome.storage.sync.get("hiddenUsers", (data) => {
   }
   if (url.includes("notifications")) {
     removeNotifications(data.hiddenUsers);
+  }
+});
+
+// Hide threads
+chrome.storage.sync.get("hiddenThreads", (data) => {
+  if (!data.hiddenThreads) {
+    return;
+  }
+  if (data.hiddenThreads.length === 0) {
+    return;
+  }
+  if (url.includes("notifications")) {
+    removeThreadNotifications(data.hiddenThreads);
   }
 });
 
@@ -187,6 +200,48 @@ function removeNotifications(users) {
 
   // Create an observer instance linked to the callback function
   const observer = new MutationObserver(remNotifications);
+
+  // Start observing the target node for configured mutations
+  observer.observe(targetNode, config);
+}
+
+function removeThreadNotifications(thread) {
+  let callOnce = false;
+
+  // Select the node that will be observed for mutations
+  const targetNode = document.getElementById("notifications");
+
+  // Options for the observer (which mutations to observe)
+  const config = { childList: true };
+
+  // Callback function to execute when mutations are observed
+  const remThreads = (mutationList, observer) => {
+    if (callOnce) return;
+    callOnce = true;
+    for (const mutation of mutationList) {
+      if (mutation.type === "childList") {
+        const items = document.getElementsByClassName("notification");
+        if (items.length !== 0) {
+          for (let i = items.length - 1; i >= 0; i--) {
+            // THREADS
+            if (
+              items[i].getElementsByClassName("icon-container").length === 1 &&
+              thread.includes(
+                items[i].getElementsByClassName("title")[0].innerText
+              )
+            ) {
+              items[i].remove();
+            }
+          }
+        } else {
+          callOnce = false;
+        }
+      }
+    }
+  };
+
+  // Create an observer instance linked to the callback function
+  const observer = new MutationObserver(remThreads);
 
   // Start observing the target node for configured mutations
   observer.observe(targetNode, config);
