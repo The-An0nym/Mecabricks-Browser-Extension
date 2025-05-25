@@ -108,3 +108,30 @@ function formattingSetup() {
 if (["models", "topic", "category", "messages"].some((s) => url.includes(s))) {
   formattingSetup();
 }
+
+// For model editor
+(function () {
+  // Select the node that will be observed for mutations
+  const targetNode = document.getElementById("gallery-content");
+
+  // Options for the observer (which mutations to observe)
+  const config = { childList: true };
+
+  // Callback function to execute when mutations are observed
+  const appendBBcode = (mutationList, observer) => {
+    for (const mutation of mutationList) {
+      if (mutation.type === "childList") {
+        const item = document.getElementById("properties");
+        if (item) {
+          setUpBBCodeFormatter(item.getElementsByTagName("textarea"));
+        }
+      }
+    }
+  };
+
+  // Create an observer instance linked to the callback function
+  const observer = new MutationObserver(appendBBcode);
+
+  // Start observing the target node for configured mutations
+  observer.observe(targetNode, config);
+})();
