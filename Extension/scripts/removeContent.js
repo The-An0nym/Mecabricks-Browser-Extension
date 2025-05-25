@@ -13,7 +13,7 @@ chrome.storage.sync.get("hideDeletedUsers", (data) => {
 
 // Numbered notifications
 chrome.storage.sync.get("numberedNotifications", (data) => {
-  if (data.numberedNotifications) {
+  if (!data.numberedNotifications) {
     document.body.style.setProperty("--font-color", "white");
   } else {
     if (!url.includes("partmanager") && !url.includes("notifications")) {
@@ -153,11 +153,7 @@ function removeMessages(users) {
 
 function removeNotifications(users) {
   let callOnce = false;
-
-  // Select the node that will be observed for mutations
   const targetNode = document.getElementById("notifications");
-
-  // Options for the observer (which mutations to observe)
   const config = { childList: true };
 
   // Callback function to execute when mutations are observed
@@ -172,23 +168,30 @@ function removeNotifications(users) {
             // PRIVATE MESSAGES
             if (
               items[i].getElementsByClassName("title")[0].innerText ===
-              "Private conversation"
+                "Private conversation" &&
+              users.includes(
+                items[i].getElementsByClassName("user")[0].innerText
+              )
             ) {
-              // Locate username
-              const username =
-                items[i].getElementsByClassName("user")[0].innerText;
-              if (users.includes(username)) {
-                items[i].remove();
-              }
+              items[i].remove();
+
               // MODELS
             } else if (
-              items[i].getElementsByClassName("image-container").length === 1
+              items[i].getElementsByClassName("image-container").length === 1 &&
+              users.includes(
+                items[i].getElementsByClassName("user")[0].innerText
+              )
             ) {
-              // Locate username
-              username = items[i].getElementsByClassName("user")[0].innerText;
-              if (users.includes(username)) {
-                items[i].remove();
-              }
+              items[i].remove();
+              // SENDERS (in case of singular notifications, i.e. unique like or comment)
+            } else if (
+              users.includes(
+                items[i].querySelector(".senders > a").innerText
+              ) &&
+              items[i].querySelector(".senders").getElementsByTagName("a")
+                .length === 1
+            ) {
+              items[i].remove();
             }
           }
         } else {
@@ -198,10 +201,7 @@ function removeNotifications(users) {
     }
   };
 
-  // Create an observer instance linked to the callback function
   const observer = new MutationObserver(remNotifications);
-
-  // Start observing the target node for configured mutations
   observer.observe(targetNode, config);
 }
 

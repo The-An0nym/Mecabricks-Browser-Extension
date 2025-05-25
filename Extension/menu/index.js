@@ -73,8 +73,8 @@ function listHiddenUsers() {
           wrapper.appendChild(span);
 
           const del = document.createElement("span");
-          del.textContent = "🗑️";
-          del.className = "button";
+          del.textContent = "✖";
+          del.className = "button delete";
           del.addEventListener("mouseup", () => {
             unhideUser(user);
           });

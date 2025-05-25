@@ -136,3 +136,10 @@ input:checked + .slider:before {
   text-overflow: ellipsis;
   max-width: 85%;
 }
+
+.delete {
+  width: 28px;
+  background-color: #f44;
+  user-select: none;
+  -webkit-user-select: none;
+}
