@@ -146,6 +146,16 @@ function removeNotifications(mutationList, users) {
       const items = document.getElementsByClassName("notification");
       if (items.length !== 0) {
         for (let i = items.length - 1; i >= 0; i--) {
+          // SENDERS (in case of singular notifications, i.e. unique like or comment)
+          if (items[i].querySelector(".senders > a")) {
+            if (
+              users.includes(items[i].querySelector(".senders > a").innerText)
+            ) {
+              items[i].remove();
+              continue;
+            }
+          }
+
           // PRIVATE MESSAGES
           if (
             items[i].getElementsByClassName("title")[0].innerText ===
@@ -153,18 +163,10 @@ function removeNotifications(mutationList, users) {
             users.includes(items[i].getElementsByClassName("user")[0].innerText)
           ) {
             items[i].remove();
-
             // MODELS
           } else if (
             items[i].getElementsByClassName("image-container").length === 1 &&
             users.includes(items[i].getElementsByClassName("user")[0].innerText)
-          ) {
-            items[i].remove();
-            // SENDERS (in case of singular notifications, i.e. unique like or comment)
-          } else if (
-            users.includes(items[i].querySelector(".senders > a").innerText) &&
-            items[i].querySelector(".senders").getElementsByTagName("a")
-              .length === 1
           ) {
             items[i].remove();
           }

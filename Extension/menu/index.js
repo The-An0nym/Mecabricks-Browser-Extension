@@ -7,6 +7,8 @@ const hidUserToggle = document.getElementById("del_user");
 const numNotifyToggle = document.getElementById("num_notifications");
 const manageUsers = document.getElementById("manage-users");
 const manageThreads = document.getElementById("manage-threads");
+const usersInp = document.getElementById("user-inp");
+const threadsInp = document.getElementById("thread-inp");
 const back = document.getElementsByClassName("back");
 const hideUserButton = document.getElementById("hide-user");
 const hideThreadButton = document.getElementById("hide-thread");
@@ -45,6 +47,12 @@ manageUsers.addEventListener("mouseup", listHiddenUsers);
 manageThreads.addEventListener("mouseup", listHiddenThreads);
 hideUserButton.addEventListener("mouseup", hideUser);
 hideThreadButton.addEventListener("mouseup", hideThread);
+usersInp.addEventListener("keyup", (e) => {
+  if (e.code === "Enter") hideUser();
+});
+threadsInp.addEventListener("keyup", (e) => {
+  if (e.code === "Enter") hideThread();
+});
 
 function options() {
   document.getElementById("options").style.display = "flex";
@@ -64,7 +72,7 @@ function listHiddenUsers() {
         // Enforce that wrapper is empty
         usersWrapper.innerHTML = "";
         const hidUsers = data.hiddenUsers;
-        for (user of hidUsers) {
+        for (const user of hidUsers) {
           wrapper = document.createElement("span");
           wrapper.className = "hidden-user-wrapper item";
 
@@ -100,8 +108,7 @@ function listHiddenUsers() {
 }
 
 function hideUser() {
-  const inp = document.getElementById("user-inp");
-  val = inp.value;
+  val = usersInp.value;
   if (val !== "") {
     chrome.storage.sync.get("hiddenUsers", (data) => {
       if (data.hiddenUsers) {
@@ -109,28 +116,31 @@ function hideUser() {
         if (!hidUsers.includes(val)) {
           // Append to list
           hidUsers.push(val);
+          // Sort list
+          hidUsers.sort((a, b) => a.localeCompare(b));
           chrome.storage.sync.set({ hiddenUsers: hidUsers });
-          inp.setAttribute("placeholder", "");
+          usersInp.setAttribute("placeholder", "");
           listHiddenUsers();
         } else {
-          inp.setAttribute("placeholder", "Already hidden");
+          usersInp.setAttribute("placeholder", "Already hidden");
         }
       } else {
         // Create list
         const hidUsers = [];
         hidUsers.push(val);
         chrome.storage.sync.set({ hiddenUsers: hidUsers });
-        inp.setAttribute("placeholder", "");
+        usersInp.setAttribute("placeholder", "");
         listHiddenUsers();
       }
     });
   } else {
-    inp.setAttribute("placeholder", "Invalid");
+    usersInp.setAttribute("placeholder", "Invalid");
   }
-  inp.value = "";
+  usersInp.value = "";
 }
 
 function unhideUser(user) {
+  console.log(user);
   chrome.storage.sync.get("hiddenUsers", (data) => {
     if (data.hiddenUsers) {
       const hidUsers = data.hiddenUsers;
@@ -156,26 +166,25 @@ function listHiddenThreads() {
         // Enforce that wrapper is empty
         threadsWrapper.innerHTML = "";
         const hidThreads = data.hiddenThreads;
-        for (threads of hidThreads) {
+        for (const thread of hidThreads) {
           wrapper = document.createElement("span");
           wrapper.className = "hidden-thread-wrapper item";
 
           span = document.createElement("span");
-          span.textContent = threads;
+          span.textContent = thread;
           wrapper.appendChild(span);
 
-          del = document.createElement("span");
-          del.textContent = "🗑️";
-          del.className = "button";
+          const del = document.createElement("span");
+          del.textContent = "✖";
+          del.className = "button delete";
           del.addEventListener("mouseup", () => {
-            unhideThread(threads);
+            unhideThread(thread);
           });
           wrapper.appendChild(del);
 
           threadsWrapper.appendChild(wrapper);
         }
       } else {
-        console.log("empty");
         // Enforce that wrapper is empty
         threadsWrapper.innerHTML = "";
         const span = document.createElement("span");
@@ -183,7 +192,6 @@ function listHiddenThreads() {
         threadsWrapper.appendChild(span);
       }
     } else {
-      console.log("empty2");
       // Enforce that wrapper is empty
       threadsWrapper.innerHTML = "";
       const span = document.createElement("span");
@@ -194,8 +202,7 @@ function listHiddenThreads() {
 }
 
 function hideThread() {
-  const inp = document.getElementById("thread-inp");
-  val = inp.value;
+  val = threadsInp.value;
   if (val !== "") {
     chrome.storage.sync.get("hiddenThreads", (data) => {
       if (data.hiddenThreads) {
@@ -204,24 +211,24 @@ function hideThread() {
           // Append to list
           hidThreads.push(val);
           chrome.storage.sync.set({ hiddenThreads: hidThreads });
-          inp.setAttribute("placeholder", "");
+          threadsInp.setAttribute("placeholder", "");
           listHiddenThreads();
         } else {
-          inp.setAttribute("placeholder", "Already hidden");
+          threadsInp.setAttribute("placeholder", "Already hidden");
         }
       } else {
         // Create list
         const hidThreads = [];
         hidThreads.push(val);
         chrome.storage.sync.set({ hiddenThreads: hidThreads });
-        inp.setAttribute("placeholder", "");
+        threadsInp.setAttribute("placeholder", "");
         listHiddenThreads();
       }
     });
   } else {
-    inp.setAttribute("placeholder", "Invalid");
+    threadsInp.setAttribute("placeholder", "Invalid");
   }
-  inp.value = "";
+  threadsInp.value = "";
 }
 
 function unhideThread(thread) {

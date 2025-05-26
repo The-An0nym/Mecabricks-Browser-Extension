@@ -45,9 +45,7 @@ async function checkNotifications() {
         // HIDE NOTIFICATION HERE
         console.log("hide!");
       } else {
-        console.warn(
-          "Notifications do not include the last saved notification"
-        );
+        console.log("Notifications do not include the last saved notification");
         // Save 10th notification
         const _notification = res.data.notifications[9];
         chrome.storage.sync.set({ lastNotification: _notification });
