@@ -1,9 +1,3 @@
-// The prupose of this file:
-// Save the last 10 - 30 Notifications and check for differences whenever new notifications pop up
-// If those changes only includes hidden users and thread, hide the notification badge
-// Maybe -> Only fetch if there is a new notification (-> Notification number increased. Save this somewhere)
-// Otherwise fetch, store differences, etc.
-// ALSO: Don't forget to link it to the manifest.json
 async function getNotifications(date) {
   const dateTime = encodeURIComponent(date);
   try {
@@ -75,7 +69,10 @@ function setNotificationHistory(notifications) {
   // Storage limit is 8192 bytes per item
   for (let i = 0; i < notifications.length; i += 12) {
     const dataBlock = {};
-    dataBlock["notificationHistory" + i] = notifications.slice(i, i + 12);
+    dataBlock["notificationHistory" + Math.floor(i / 12)] = notifications.slice(
+      i,
+      i + 12
+    );
     chrome.storage.sync.set(dataBlock);
   }
 }
@@ -102,18 +99,8 @@ function normalizeList(notifications) {
     }
 
     for (let j = i + 1; j < notifications.length; j++) {
-      // See if "duplicates" (same model/thread/etc.)
-      const n2 = notifications[j];
-      if (n1.code !== n2.code) continue;
-      if ([1010, 1011, 1012].includes(n1.code)) {
-        if (n1.model.alphanumId !== n2.model.alphanumId) continue;
-      } else if (n1.code === 1020) {
-        if (n1.topic.id !== n2.topic.id) continue;
-      } else if (n1.code === 1030) {
-        if (n1.chat.alphanumId !== n2.chat.alphanumId) continue;
-      }
-      // Delete n2
-      notifications.splice(j, 1);
+      // See if "duplicates" (same model/thread/etc.) -> If yes, delete notif at second pointer (j)
+      if (sameOrigin(n1, notifications[j])) notifications.splice(j, 1);
     }
   }
 }
@@ -124,30 +111,23 @@ function clearNotifications() {
     document.querySelector("a > .notifications").remove();
   } else if (url.includes("partmanager")) {
     document.querySelector(".user > .notifications").remove();
-  } /*else if (url.includes("notifications")) {
-    loadHistory(); // This will refresh history
-  }*/ else {
+  } else {
     if (document.querySelector("#header-notifications"))
       document.querySelector("#header-notifications").remove();
   }
 }
 
-function areNotificationsSame(n1, n2) {
-  return n1.datetime === n2.datetime;
-}
-
-// For later
-// When trying to figure out which senders are wrong/same
-function sendersSomething(obj1, obj2) {
-  if (obj1.code !== obj2.code) return false;
+function sameOrigin(notif1, notif2) {
+  if (notif1.code !== notif2.code) return false;
   // Compare IDs
-  if ([1010, 1011, 1012].includes(n1.code)) {
-    if (n1.model.alphanumId !== n2.model.alphanumId) return false;
-  } else if (n1.code === 1020) {
-    if (n1.topic.id !== n2.topic.id) return false;
-  } else if (n1.code === 1030) {
-    if (n1.chat.alphanumId !== n2.chat.alphanumId) return false;
+  if ([1010, 1011, 1012].includes(notif1.code)) {
+    if (notif1.model.alphanumId !== notif2.model.alphanumId) return false;
+  } else if (notif1.code === 1020) {
+    if (notif1.topic.id !== notif2.topic.id) return false;
+  } else if (notif1.code === 1030) {
+    if (notif1.chat.alphanumId !== notif2.chat.alphanumId) return false;
   }
+  return true;
 }
 
 async function checkNotifications() {
@@ -158,8 +138,6 @@ async function checkNotifications() {
   const hidThreads = sHiddenThreads.hiddenThreads;
   const hideDelUsers = sHideDeletedUsers.hideDeletedUsers;
 
-  console.log(hidUsers);
-
   if (!hidUsers && !hidThreads && !hideDelUsers) return;
 
   const sNotificationsHistory0 = await chrome.storage.sync.get(
@@ -169,16 +147,12 @@ async function checkNotifications() {
 
   if (!notifHistory0) {
     loadHistory();
-    console.log("Load History");
     return;
   }
 
   const notifications = await getNewNotifications(notifHistory0);
 
-  console.log(notifications);
-
   if (!notifications) {
-    console.log(!notifications);
     clearNotifications();
     return;
   }
@@ -188,14 +162,24 @@ async function checkNotifications() {
   }
 
   if (await allNotificationsBlocked(notifications, hidUsers, hidThreads)) {
-    // DO STUFF HERE: TODO
-    // Store datetimes so that the notifications can also be hidden in the notifications tab
+    const completeNotifsHistory = await getNotificationHistory();
+    setNotificationHistory(notifications.concat(completeNotifsHistory));
     clearNotifications();
     return;
   } else {
-    // Do nothing ig? -> Unhide notifications?
-    // Save number
+    // NOTIFICATIONS AREN'T ALL BLOCKED
   }
+}
+
+async function getNotificationHistory() {
+  let notifications = [];
+  for (let i = 0; i < 25; i++) {
+    const key = "notificationHistory" + i;
+    const notifBlock = await chrome.storage.sync.get(key);
+    if (!notifBlock[key]) break;
+    notifications = notifications.concat(notifBlock[key]);
+  }
+  return notifications;
 }
 
 async function getNewNotifications(notifHistory0) {
@@ -211,15 +195,95 @@ async function getNewNotifications(notifHistory0) {
 }
 
 async function allNotificationsBlocked(notifications, hidUsers, hidThreads) {
-  for (let i = 0; i < notifications.length; i++) {
+  for (const notif of notifications) {
+    if (notif.senders.users.every((u) => hidUsers.includes(u.name))) continue;
+    // In future this may be handled via ID instead of title name
+    if (notif.code === 1020) {
+      if (hidThreads) if (hidThreads.includes(notif.topic.title)) continue;
+    } else if ([1010, 1011, 1012].includes(notif.code)) {
+      if (hidUsers.includes(notif.model.user.name)) continue;
+    }
+
+    // Check if any sender is spam
+    if (!notif.senders.users.some((u) => hidUsers.includes(u.name)))
+      return false;
+    // Check if single sender -> If not, it should have `continued` before
+    if (notif.senders.users.length === 1) return false;
+    if (!(await newSendersBlocked(notif, hidUsers))) return false;
     // Loop with isNotificationBlocked with notifications and hiddenUsers
   }
+
+  return true;
+}
+
+async function newSendersBlocked(notif, hidUsers) {
+  // Max 300 notifs will be stored in the notification history.
+  // 300 / 12 = 25
+  for (let i = 0; i < 25; i++) {
+    const histKey = "notificationHistory" + i;
+    const notifBlock = await chrome.storage.sync.get(histKey);
+    if (!notifBlock[histKey]) return false; // As not every is blocked, there will be a new non-hidden user
+    for (const oldNotif of notifBlock[histKey]) {
+      if (!sameOrigin(oldNotif, notif)) continue;
+      const oldSenders = oldNotif.senders.users.map((u) => u.name);
+      const newSenders = notif.senders.users.map((u) => u.name);
+
+      // Newest sender HAS to be hidUser
+      if (!hidUsers.includes(newSenders[0])) return false;
+      // Most recent not-hidden user
+      const lastIndex = oldSenders.findIndex((s) => !hidUsers.includes(s));
+      const lastUser = oldSenders[lastIndex];
+      // Senders list HAS to include the most rencent sender of the old senders
+      if (!newSenders.includes(lastUser)) return false;
+      const index = newSenders.indexOf(lastUser);
+
+      // Order not same
+      if (
+        !newSenders
+          .slice(index)
+          .every((s, k) => s === oldSenders[lastIndex + k])
+      )
+        return false;
+      // Newest users not all blocked
+      if (!newSenders.slice(0, index).every((s) => hidUsers.includes(s)))
+        return false;
+
+      // Store datetimes so that the notifications can also be hidden in the notifications tab
+      blackListDateTime(notif.datetime);
+
+      return true;
+    }
+  }
+
+  // In case none were found
   return false;
 }
 
-function isNotificationBlocked(notification) {
-  // Do stuff here
-  return false;
+async function blackListDateTime(datetime) {
+  const preList = await chrome.storage.sync.get("datetimeBlacklist");
+  const obj = {};
+  if (preList.datetimeBlacklist)
+    obj.datetimeBlackList = preList.datetimeBlackList.push(datetime);
+  else obj.datetimeBlackList = [datetime];
+  chrome.storage.sync.set(obj);
+}
+
+async function storeLatestNotifications() {
+  const notifHist0 = await chrome.storage.sync.get("notificationHistory0");
+  if (!notifHist0.notificationHistory0) {
+    loadHistory();
+    return;
+  }
+
+  const lastDateTime = notifHist0.notificationHistory0[0].datetime;
+  const newNotifications = await loadUntilDateTime(Date.parse(lastDateTime));
+
+  // No new notifications
+  if (!newNotifications) return;
+
+  const oldNotifications = await getNotificationHistory();
+
+  setNotificationHistory(oldNotifications.concat(newNotifications));
 }
 
 // Check if there are notifications
@@ -227,8 +291,8 @@ if (url.includes("workshop")) {
   if (document.querySelector("a > .notifications")) checkNotifications();
 } else if (url.includes("partmanager")) {
   if (document.querySelector(".user > .notifications")) checkNotifications();
-} /* else if (url.includes("notifications")) {
-  storeLatestNotification();
-}*/ else {
+} else if (url.includes("notifications")) {
+  storeLatestNotifications();
+} else {
   if (document.querySelector("#header-notifications")) checkNotifications();
 }
