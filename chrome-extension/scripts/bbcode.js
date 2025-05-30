@@ -115,7 +115,16 @@ function privateLibrarySetup(mutationList) {
     if (mutation.type === "childList") {
       const item = document.getElementById("properties");
       if (item) {
-        setUpBBCodeFormatter(item.getElementsByTagName("textarea"));
+        // Make description box vertically extenable
+        const ta = item.getElementsByTagName("textarea");
+        ta[0].style.resize = "vertical";
+        ta[0].style.minHeight = "120px";
+        ta[0].style.maxHeight = "480px";
+        ta[0].style.width = "640px";
+        ta[0].parentNode.style.height = "auto";
+        ta[0].parentNode.style.paddingBottom = "0"; // Remove thicker bottom edge
+        ta[0].parentNode.style.width = "660px";
+        setUpBBCodeFormatter(ta);
       }
       break;
     }
