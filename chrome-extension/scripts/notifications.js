@@ -165,6 +165,7 @@ async function checkNotifications() {
     const completeNotifsHistory = await getNotificationHistory();
     setNotificationHistory(notifications.concat(completeNotifsHistory));
     clearNotifications();
+    storeLatestNotifications();
     return;
   } else {
     // NOTIFICATIONS AREN'T ALL BLOCKED
@@ -283,7 +284,7 @@ async function storeLatestNotifications() {
 
   const oldNotifications = await getNotificationHistory();
 
-  setNotificationHistory(oldNotifications.concat(newNotifications));
+  setNotificationHistory(newNotifications.concat(oldNotifications));
 }
 
 // Check if there are notifications
