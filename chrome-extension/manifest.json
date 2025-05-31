@@ -24,8 +24,9 @@
         "scripts/alert.js",
         "scripts/bbcode.js",
         "scripts/removeContent.js",
-        "scripts/workshop.js",
-        "scripts/notifications.js"
+        "scripts/referenceImages.js",
+        "scripts/notifications.js",
+        "scripts/workshopFolders.js"
       ],
       "css": ["styles/main.css"],
       "runAt": "document_start",

@@ -124,7 +124,7 @@ function privateLibrarySetup(mutationList) {
         ta[0].parentNode.style.height = "auto";
         ta[0].parentNode.style.paddingBottom = "0"; // Remove thicker bottom edge
         ta[0].parentNode.style.width = "660px";
-        setUpBBCodeFormatter(ta);
+        if (window - properties) setUpBBCodeFormatter(ta);
       }
       break;
     }

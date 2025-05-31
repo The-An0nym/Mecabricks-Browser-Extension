@@ -69,10 +69,8 @@ function setNotificationHistory(notifications) {
   // Storage limit is 8192 bytes per item
   for (let i = 0; i < notifications.length; i += 12) {
     const dataBlock = {};
-    dataBlock["notificationHistory" + Math.floor(i / 12)] = notifications.slice(
-      i,
-      i + 12
-    );
+    const key = "notificationHistory" + Math.floor(i / 12);
+    dataBlock[key] = notifications.slice(i, i + 12);
     chrome.storage.sync.set(dataBlock);
   }
 }
@@ -85,7 +83,6 @@ function setNotificationHistory(notifications) {
 // 1030 Message
 
 function normalizeList(notifications) {
-  // O(n^2)... whoopsie
   // notifications.length will automatically update
   for (let i = 0; i <= notifications.length - 1; i++) {
     // Check if expired
@@ -161,6 +158,8 @@ async function checkNotifications() {
     hidUsers.push("");
   }
 
+  console.log(notifications);
+
   if (await allNotificationsBlocked(notifications, hidUsers, hidThreads)) {
     const completeNotifsHistory = await getNotificationHistory();
     setNotificationHistory(notifications.concat(completeNotifsHistory));
@@ -210,8 +209,8 @@ async function allNotificationsBlocked(notifications, hidUsers, hidThreads) {
       return false;
     // Check if single sender -> If not, it should have `continued` before
     if (notif.senders.users.length === 1) return false;
-    if (!(await newSendersBlocked(notif, hidUsers))) return false;
     // Loop with isNotificationBlocked with notifications and hiddenUsers
+    if (!(await newSendersBlocked(notif, hidUsers))) return false;
   }
 
   return true;
