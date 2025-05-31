@@ -10,7 +10,8 @@ function loadImage(e) {
 
   const sep = file.name.split(".");
   const ext = sep.pop();
-  if (!["jpg", "jpeg", "png", "gif"].includes(ext)) return;
+  if (!["jpg", "jpeg", "png", "gif", "webp"].includes(ext.toLowerCase()))
+    return;
   const name = sep.join(".");
 
   const bgElement = document.querySelector("div.scene > canvas");
@@ -192,7 +193,7 @@ function createMenuPanel() {
   const input = document.createElement("input");
   input.id = "image-input";
   input.type = "file";
-  input.accept = ".png, .jpeg, .jpg, .gif";
+  input.accept = ".png, .jpeg, .jpg, .gif, .webp";
   input.addEventListener("change", loadImage);
 
   inputSection.appendChild(input);

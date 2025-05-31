@@ -47,14 +47,14 @@ chrome.storage.sync.get("hiddenUsers", (data) => {
     const config = { childList: true };
     if (url.includes("messages")) {
       const targetNode = document.getElementsByClassName("nano-content")[0];
-      const observer = new MutationObserver((e) => {
-        removeMessages(e, data.hiddenUsers);
+      const observer = new MutationObserver(() => {
+        removeMessages(data.hiddenUsers);
       });
       observer.observe(targetNode, config);
     } else if (url.includes("notifications")) {
       const targetNode = document.getElementById("notifications");
-      const observer = new MutationObserver((e) => {
-        removeNotifications(e, data.hiddenUsers);
+      const observer = new MutationObserver(() => {
+        removeNotifications(data.hiddenUsers);
       });
       observer.observe(targetNode, config);
     }
@@ -72,8 +72,8 @@ chrome.storage.sync.get("hiddenThreads", (data) => {
   if (url.includes("notifications")) {
     const targetNode = document.getElementById("notifications");
     const config = { childList: true };
-    const observer = new MutationObserver((e) => {
-      removeThreadNotifications(e, data.hiddenThreads);
+    const observer = new MutationObserver(() => {
+      removeThreadNotifications(data.hiddenThreads);
     });
     observer.observe(targetNode, config);
   }
@@ -119,82 +119,61 @@ function removeThread(users) {
   }
 }
 
-/* Mutation obs functions */
-function removeMessages(mutationList, users) {
-  for (const mutation of mutationList) {
-    if (mutation.type === "childList") {
-      const items = document.getElementsByClassName("item");
-      if (items.length !== 0) {
-        for (let i = items.length - 1; i >= 0; i--) {
-          if (
-            users.includes(
-              items[i].getElementsByClassName("username")[0].innerText
-            )
-          ) {
-            items[i].remove();
-          }
-        }
+/* Mutation obs triggered functions */
+function removeMessages(users) {
+  const items = document.getElementsByClassName("item");
+  if (items.length !== 0) {
+    for (let i = items.length - 1; i >= 0; i--) {
+      if (
+        users.includes(items[i].getElementsByClassName("username")[0].innerText)
+      ) {
+        items[i].remove();
       }
-      break; // Ensures it only runs once
     }
   }
 }
 
-function removeNotifications(mutationList, users) {
-  for (const mutation of mutationList) {
-    if (mutation.type === "childList") {
-      const items = document.getElementsByClassName("notification");
-      if (items.length !== 0) {
-        for (let i = items.length - 1; i >= 0; i--) {
-          // SENDERS (in case of singular notifications, i.e. unique like or comment)
-          if (items[i].querySelector(".senders > a")) {
-            if (
-              users.includes(items[i].querySelector(".senders > a").innerText)
-            ) {
-              items[i].remove();
-              continue;
-            }
-          }
-
-          // PRIVATE MESSAGES
-          if (
-            items[i].getElementsByClassName("title")[0].innerText ===
-              "Private conversation" &&
-            users.includes(items[i].getElementsByClassName("user")[0].innerText)
-          ) {
-            items[i].remove();
-            // MODELS
-          } else if (
-            items[i].getElementsByClassName("image-container").length === 1 &&
-            users.includes(items[i].getElementsByClassName("user")[0].innerText)
-          ) {
-            items[i].remove();
-          }
+function removeNotifications(users) {
+  const items = document.getElementsByClassName("notification");
+  if (items.length !== 0) {
+    for (let i = items.length - 1; i >= 0; i--) {
+      // SENDERS (in case of singular notifications, i.e. unique like or comment)
+      if (items[i].querySelector(".senders > a")) {
+        if (users.includes(items[i].querySelector(".senders > a").innerText)) {
+          items[i].remove();
+          continue;
         }
       }
-      break; // Ensures it only runs once
+
+      // PRIVATE MESSAGES
+      if (
+        items[i].getElementsByClassName("title")[0].innerText ===
+          "Private conversation" &&
+        users.includes(items[i].getElementsByClassName("user")[0].innerText)
+      ) {
+        items[i].remove();
+        // MODELS
+      } else if (
+        items[i].getElementsByClassName("image-container").length === 1 &&
+        users.includes(items[i].getElementsByClassName("user")[0].innerText)
+      ) {
+        items[i].remove();
+      }
     }
   }
 }
 
-function removeThreadNotifications(mutationList, thread) {
-  for (const mutation of mutationList) {
-    if (mutation.type === "childList") {
-      const items = document.getElementsByClassName("notification");
-      if (items.length !== 0) {
-        for (let i = items.length - 1; i >= 0; i--) {
-          // THREADS
-          if (
-            items[i].getElementsByClassName("icon-container").length === 1 &&
-            thread.includes(
-              items[i].getElementsByClassName("title")[0].innerText
-            )
-          ) {
-            items[i].remove();
-          }
-        }
+function removeThreadNotifications(thread) {
+  const items = document.getElementsByClassName("notification");
+  if (items.length !== 0) {
+    for (let i = items.length - 1; i >= 0; i--) {
+      // THREADS
+      if (
+        items[i].getElementsByClassName("icon-container").length === 1 &&
+        thread.includes(items[i].getElementsByClassName("title")[0].innerText)
+      ) {
+        items[i].remove();
       }
-      break; // Ensures it only runs once
     }
   }
 }

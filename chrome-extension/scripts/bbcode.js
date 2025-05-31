@@ -1,5 +1,5 @@
 function setUpBBCodeFormatter(textAs) {
-  for (texta of textAs) {
+  for (const texta of textAs) {
     //prettier-ignore
     const fTypes = ["i", "b", "u", "s", "center", "code", "img", "url", "color", "size"];
 
@@ -46,9 +46,7 @@ function checkSelection(container, e, removeWhiteSpace) {
     return;
   }
 
-  if (textSelection.trim() === "") {
-    return;
-  }
+  if (textSelection.trim() === "") return;
 
   if (removeWhiteSpace) {
     if (textSelection.trim().length !== textSelection.length) {
@@ -110,24 +108,19 @@ if (["models", "topic", "category", "messages"].some((s) => url.includes(s))) {
 }
 
 // For model editor
-function privateLibrarySetup(mutationList) {
-  for (const mutation of mutationList) {
-    if (mutation.type === "childList") {
-      const item = document.getElementById("properties");
-      if (item) {
-        // Make description box vertically extenable
-        const ta = item.getElementsByTagName("textarea");
-        ta[0].style.resize = "vertical";
-        ta[0].style.minHeight = "120px";
-        ta[0].style.maxHeight = "480px";
-        ta[0].style.width = "640px";
-        ta[0].parentNode.style.height = "auto";
-        ta[0].parentNode.style.paddingBottom = "0"; // Remove thicker bottom edge
-        ta[0].parentNode.style.width = "660px";
-        if (window - properties) setUpBBCodeFormatter(ta);
-      }
-      break;
-    }
+function privateLibrarySetup() {
+  const item = document.getElementById("properties");
+  if (item) {
+    // Make description box vertically extenable
+    const ta = item.getElementsByTagName("textarea");
+    ta[0].style.resize = "vertical";
+    ta[0].style.minHeight = "120px";
+    ta[0].style.maxHeight = "480px";
+    ta[0].style.width = "640px";
+    ta[0].parentNode.style.height = "auto";
+    ta[0].parentNode.style.paddingBottom = "0"; // Remove thicker bottom edge
+    ta[0].parentNode.style.width = "660px";
+    if (window - properties) setUpBBCodeFormatter(ta);
   }
 }
 
@@ -136,4 +129,20 @@ if (url.includes("account/library")) {
   const targetNode = document.getElementById("gallery-content");
   const observer = new MutationObserver(privateLibrarySetup);
   observer.observe(targetNode, config);
+}
+
+if (url.includes("topic")) {
+  const navBar = document.getElementById("nav-bar");
+  const button = document.createElement("button");
+  button.textContent = "Block";
+  button.className = "block-button forum-button";
+  navBar.appendChild(button);
+}
+
+if (url.includes("models")) {
+  const comment = document.getElementById("comments-qty");
+  const button = document.createElement("button");
+  button.textContent = "Block";
+  button.className = "block-button";
+  comment.appendChild(button);
 }
