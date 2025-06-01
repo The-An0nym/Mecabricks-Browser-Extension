@@ -110,12 +110,12 @@ input:checked + .slider:before {
 }
 
 #hidden-users,
-#hidden-threads {
+#hidden-ids {
   display: none;
 }
 
 #users-wrapper,
-#threads-wrapper {
+#ids-wrapper {
   display: flex;
   flex-direction: column;
   max-height: 70vh;
@@ -123,14 +123,14 @@ input:checked + .slider:before {
 }
 
 .hidden-user-wrapper,
-.hidden-thread-wrapper {
+.hidden-ids-wrapper {
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid #555;
 }
 
 .hidden-user-wrapper > span,
-.hidden-thread-wrapper > span {
+.hidden-ids-wrapper > span {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -142,4 +142,12 @@ input:checked + .slider:before {
   background-color: #f44;
   user-select: none;
   -webkit-user-select: none;
+}
+
+.thread-item {
+  background-color: #efe;
+}
+
+.model-item {
+  background-color: #eef;
 }

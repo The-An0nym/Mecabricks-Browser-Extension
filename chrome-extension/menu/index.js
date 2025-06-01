@@ -6,12 +6,10 @@
 const hidUserToggle = document.getElementById("del_user");
 const numNotifyToggle = document.getElementById("num_notifications");
 const manageUsers = document.getElementById("manage-users");
-const manageThreads = document.getElementById("manage-threads");
+const manageIds = document.getElementById("manage-ids");
 const usersInp = document.getElementById("user-inp");
-const threadsInp = document.getElementById("thread-inp");
 const back = document.getElementsByClassName("back");
 const hideUserButton = document.getElementById("hide-user");
-const hideThreadButton = document.getElementById("hide-thread");
 
 /* HIDE DELETED USERS*/
 // Load saved state
@@ -44,20 +42,16 @@ numNotifyToggle.addEventListener("change", () => {
 // EVENT LISTENERS
 for (let i of back) i.addEventListener("mouseup", options);
 manageUsers.addEventListener("mouseup", listHiddenUsers);
-manageThreads.addEventListener("mouseup", listHiddenThreads);
+manageIds.addEventListener("mouseup", listIdNames);
 hideUserButton.addEventListener("mouseup", hideUser);
-hideThreadButton.addEventListener("mouseup", hideThread);
 usersInp.addEventListener("keyup", (e) => {
   if (e.code === "Enter") hideUser();
-});
-threadsInp.addEventListener("keyup", (e) => {
-  if (e.code === "Enter") hideThread();
 });
 
 function options() {
   document.getElementById("options").style.display = "flex";
   document.getElementById("hidden-users").style.display = "none";
-  document.getElementById("hidden-threads").style.display = "none";
+  document.getElementById("hidden-ids").style.display = "none";
 }
 
 /* HIDDEN USERS */
@@ -108,7 +102,8 @@ function listHiddenUsers() {
 }
 
 function hideUser() {
-  val = usersInp.value;
+  const val = usersInp.value.trim().toLowerCase();
+
   if (val !== "") {
     chrome.storage.sync.get("hiddenUsers", (data) => {
       if (data.hiddenUsers) {
@@ -155,93 +150,89 @@ function unhideUser(user) {
   });
 }
 
-/* HIDDEN THREADS */
-function listHiddenThreads() {
+/* blocked ids */
+async function listIdNames() {
   document.getElementById("options").style.display = "none";
-  document.getElementById("hidden-threads").style.display = "flex";
-  const threadsWrapper = document.getElementById("threads-wrapper");
-  chrome.storage.sync.get("hiddenThreads", (data) => {
-    if (data.hiddenThreads) {
-      if (data.hiddenThreads.length !== 0) {
-        // Enforce that wrapper is empty
-        threadsWrapper.innerHTML = "";
-        const hidThreads = data.hiddenThreads;
-        for (const thread of hidThreads) {
-          wrapper = document.createElement("span");
-          wrapper.className = "hidden-thread-wrapper item";
+  document.getElementById("hidden-ids").style.display = "flex";
+  const idsWrapper = document.getElementById("ids-wrapper");
+  const hidden = await chrome.storage.sync.get("hidden_id_name");
 
-          span = document.createElement("span");
-          span.textContent = thread;
-          wrapper.appendChild(span);
+  idsWrapper.innerHTML = "";
 
-          const del = document.createElement("span");
-          del.textContent = "✖";
-          del.className = "button delete";
-          del.addEventListener("mouseup", () => {
-            unhideThread(thread);
-          });
-          wrapper.appendChild(del);
-
-          threadsWrapper.appendChild(wrapper);
-        }
-      } else {
-        // Enforce that wrapper is empty
-        threadsWrapper.innerHTML = "";
-        const span = document.createElement("span");
-        span.textContent = "You have no hidden threads...";
-        threadsWrapper.appendChild(span);
-      }
-    } else {
-      // Enforce that wrapper is empty
-      threadsWrapper.innerHTML = "";
-      const span = document.createElement("span");
-      span.textContent = "You have no hidden threads...";
-      threadsWrapper.appendChild(span);
-    }
-  });
-}
-
-function hideThread() {
-  val = threadsInp.value;
-  if (val !== "") {
-    chrome.storage.sync.get("hiddenThreads", (data) => {
-      if (data.hiddenThreads) {
-        const hidThreads = data.hiddenThreads;
-        if (!hidThreads.includes(val)) {
-          // Append to list
-          hidThreads.push(val);
-          chrome.storage.sync.set({ hiddenThreads: hidThreads });
-          threadsInp.setAttribute("placeholder", "");
-          listHiddenThreads();
-        } else {
-          threadsInp.setAttribute("placeholder", "Already hidden");
-        }
-      } else {
-        // Create list
-        const hidThreads = [];
-        hidThreads.push(val);
-        chrome.storage.sync.set({ hiddenThreads: hidThreads });
-        threadsInp.setAttribute("placeholder", "");
-        listHiddenThreads();
-      }
-    });
-  } else {
-    threadsInp.setAttribute("placeholder", "Invalid");
+  if (!hidden.hidden_id_name) {
+    const span = document.createElement("span");
+    span.textContent = "You have no unsubscribed things...";
+    threadsWrapper.appendChild(span);
+    return;
   }
-  threadsInp.value = "";
+
+  if (
+    !hidden.hidden_id_name.ids.length ||
+    !hidden.hidden_id_name.names.length
+  ) {
+    const span = document.createElement("span");
+    span.textContent = "You have no unsubscribed things...";
+    idsWrapper.appendChild(span);
+    return;
+  }
+
+  for (let i = 0; i < hidden.hidden_id_name.ids.length; i++) {
+    wrapper = document.createElement("span");
+    if (
+      !isNaN(hidden.hidden_id_name.ids[i]) &&
+      hidden.hidden_id_name.ids[i].length < 10
+    ) {
+      wrapper.className = "hidden-ids-wrapper item thread-item";
+    } else {
+      wrapper.className = "hidden-ids-wrapper item model-item";
+    }
+
+    span = document.createElement("span");
+    span.textContent = hidden.hidden_id_name.names[i];
+    wrapper.appendChild(span);
+
+    const del = document.createElement("span");
+    del.textContent = "✖";
+    del.className = "button delete";
+    del.addEventListener("mouseup", async () => {
+      await removeId(
+        hidden.hidden_id_name.ids[i],
+        hidden.hidden_id_name.names[i]
+      );
+      listIdNames();
+    });
+    wrapper.appendChild(del);
+
+    idsWrapper.appendChild(wrapper);
+  }
 }
 
-function unhideThread(thread) {
-  chrome.storage.sync.get("hiddenThreads", (data) => {
-    if (data.hiddenThreads) {
-      hidThreads = data.hiddenThreads;
-      if (hidThreads.includes(thread)) {
-        // Update List
-        const indx = hidThreads.indexOf(thread);
-        hidThreads.splice(indx, 1);
-        chrome.storage.sync.set({ hiddenThreads: hidThreads });
-        listHiddenThreads();
-      }
-    }
-  });
+/* COPY PASTE FROM (currently) BBCODE.JS */
+async function removeId(id, name) {
+  if (!id || !name) return;
+  const previous = await chrome.storage.sync.get("hidden_id_name");
+
+  if (!previous.hidden_id_name) return;
+  let newIDs = previous.hidden_id_name.ids;
+  let newNames = previous.hidden_id_name.names;
+
+  const idIndex = newIDs.indexOf(id);
+
+  if (newNames.includes(id)) {
+    const index = newNames.indexOf(id);
+    newNames.splice(index, 1);
+  } else if (newNames.length === newIDs.length) {
+    newNames.splice(idIndex, 1);
+  } else return;
+
+  if (newIDs.includes(id)) {
+    newIDs.splice(idIndex, 1);
+  } else return;
+
+  const obj = {};
+  obj.hidden_id_name = {};
+  obj.hidden_id_name.ids = newIDs;
+  obj.hidden_id_name.names = newNames;
+
+  chrome.storage.sync.set(obj);
 }

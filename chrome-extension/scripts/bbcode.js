@@ -131,18 +131,118 @@ if (url.includes("account/library")) {
   observer.observe(targetNode, config);
 }
 
-if (url.includes("topic")) {
+/* BLOCK MECHANISM */
+
+if (url.includes("topic")) threadSubButton();
+async function threadSubButton() {
   const navBar = document.getElementById("nav-bar");
   const button = document.createElement("button");
-  button.textContent = "Block";
+
+  const urlList = url.split("/");
+  const id = urlList[urlList.indexOf("topic") + 1];
+  const name = navBar.getElementsByTagName("b")[0].textContent;
+  if (await unsubscribed(id)) {
+    button.addEventListener("mouseup", async () => {
+      await removeId(id, name);
+      button.remove();
+      threadSubButton();
+    });
+    button.textContent = "Resubscribe";
+  } else {
+    button.addEventListener("mouseup", async () => {
+      await storeId(id, name);
+      button.remove();
+      threadSubButton();
+    });
+    button.textContent = "Unsubscribe";
+  }
   button.className = "block-button forum-button";
+
   navBar.appendChild(button);
 }
 
-if (url.includes("models")) {
+if (url.includes("models")) modelSubButton();
+async function modelSubButton() {
   const comment = document.getElementById("comments-qty");
   const button = document.createElement("button");
-  button.textContent = "Block";
+
+  const id = url.split("/").pop();
+  const name = document.getElementsByClassName("name")[0].textContent;
+  if (await unsubscribed(id)) {
+    button.addEventListener("mouseup", async () => {
+      await removeId(id, name);
+      button.remove();
+      modelSubButton();
+    });
+    button.textContent = "Resubscribe";
+  } else {
+    button.addEventListener("mouseup", async () => {
+      await storeId(id, name);
+      button.remove();
+      modelSubButton();
+    });
+    button.textContent = "Unsubscribe";
+  }
   button.className = "block-button";
+
   comment.appendChild(button);
+}
+
+async function unsubscribed(id) {
+  const hidden = await chrome.storage.sync.get("hidden_id_name");
+  if (hidden.hidden_id_name) return hidden.hidden_id_name.ids.includes(id);
+  else return false;
+}
+
+async function storeId(id, name) {
+  if (!id || !name) return;
+  const previous = await chrome.storage.sync.get("hidden_id_name");
+  let newIDs = [];
+  let newNames = [];
+  if (previous.hidden_id_name) {
+    newIDs = previous.hidden_id_name.ids;
+    if (newIDs.includes(id)) return;
+    newIDs.push(id);
+    newNames = previous.hidden_id_name.names;
+    newNames.push(name);
+  } else {
+    newIDs = [id];
+    newNames = [name];
+  }
+
+  const obj = {};
+  obj.hidden_id_name = {};
+  obj.hidden_id_name.ids = newIDs;
+  obj.hidden_id_name.names = newNames;
+
+  chrome.storage.sync.set(obj);
+}
+
+async function removeId(id, name) {
+  if (!id || !name) return;
+  const previous = await chrome.storage.sync.get("hidden_id_name");
+
+  if (!previous.hidden_id_name) return;
+  let newIDs = previous.hidden_id_name.ids;
+  let newNames = previous.hidden_id_name.names;
+
+  const idIndex = newIDs.indexOf(id);
+
+  if (newNames.includes(id)) {
+    const index = newNames.indexOf(id);
+    newNames.splice(index, 1);
+  } else if (newNames.length === newIDs.length) {
+    newNames.splice(idIndex, 1);
+  } else return;
+
+  if (newIDs.includes(id)) {
+    newIDs.splice(idIndex, 1);
+  } else return;
+
+  const obj = {};
+  obj.hidden_id_name = {};
+  obj.hidden_id_name.ids = newIDs;
+  obj.hidden_id_name.names = newNames;
+
+  chrome.storage.sync.set(obj);
 }

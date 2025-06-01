@@ -62,18 +62,18 @@ chrome.storage.sync.get("hiddenUsers", (data) => {
 });
 
 // Hide threads
-chrome.storage.sync.get("hiddenThreads", (data) => {
-  if (!data.hiddenThreads) {
+chrome.storage.sync.get("hidden_id_name", (data) => {
+  if (!data.hidden_id_name) {
     return;
   }
-  if (data.hiddenThreads.length === 0) {
+  if (data.hidden_id_name.length === 0) {
     return;
   }
   if (url.includes("notifications")) {
     const targetNode = document.getElementById("notifications");
     const config = { childList: true };
     const observer = new MutationObserver(() => {
-      removeThreadNotifications(data.hiddenThreads);
+      removeById(data.hidden_id_name.ids);
     });
     observer.observe(targetNode, config);
   }
@@ -82,7 +82,7 @@ chrome.storage.sync.get("hiddenThreads", (data) => {
 function removeComments(users) {
   const usernames = document.getElementsByClassName("author");
   for (let i = usernames.length - 1; i >= 0; i--) {
-    if (users.includes(usernames[i].innerText)) {
+    if (users.includes(usernames[i].innerText.trim().toLowerCase())) {
       usernames[i].parentNode.parentNode.parentNode.remove();
       console.log("%c removed element!", "background: #c20; color: #fff");
     }
@@ -92,7 +92,7 @@ function removeComments(users) {
 function removePosts(users) {
   const usernames = document.getElementsByClassName("username");
   for (let i = usernames.length - 1; i >= 0; i--) {
-    if (users.includes(usernames[i].innerText)) {
+    if (users.includes(usernames[i].innerText.trim().toLowerCase())) {
       usernames[i].parentNode.parentNode.parentNode.parentNode.remove();
       console.log("%c removed element!", "background: #c20; color: #fff");
     }
@@ -102,7 +102,7 @@ function removePosts(users) {
 function removeModels(users) {
   const usernames = document.getElementsByClassName("username");
   for (let i = usernames.length - 1; i >= 0; i--) {
-    if (users.includes(usernames[i].innerText)) {
+    if (users.includes(usernames[i].innerText.trim().toLowerCase())) {
       usernames[i].parentNode.parentNode.parentNode.remove();
       console.log("%c removed element!", "background: #c20; color: #fff");
     }
@@ -112,7 +112,11 @@ function removeModels(users) {
 function removeThread(users) {
   const usernames = document.getElementsByClassName("info");
   for (let i = usernames.length - 1; i >= 0; i--) {
-    if (users.includes(usernames[i].getElementsByTagName("a")[0].innerText)) {
+    if (
+      users.includes(
+        usernames[i].getElementsByTagName("a")[0].innerText.trim().toLowerCase()
+      )
+    ) {
       usernames[i].parentNode.parentNode.remove();
       console.log("%c removed element!", "background: #c20; color: #fff");
     }
@@ -125,7 +129,12 @@ function removeMessages(users) {
   if (items.length !== 0) {
     for (let i = items.length - 1; i >= 0; i--) {
       if (
-        users.includes(items[i].getElementsByClassName("username")[0].innerText)
+        users.includes(
+          items[i]
+            .getElementsByClassName("username")[0]
+            .innerText.trim()
+            .toLowerCase()
+        )
       ) {
         items[i].remove();
       }
@@ -139,7 +148,14 @@ function removeNotifications(users) {
     for (let i = items.length - 1; i >= 0; i--) {
       // SENDERS (in case of singular notifications, i.e. unique like or comment)
       if (items[i].querySelector(".senders > a")) {
-        if (users.includes(items[i].querySelector(".senders > a").innerText)) {
+        if (
+          users.includes(
+            items[i]
+              .querySelector(".senders > a")
+              .innerText.trim()
+              .toLowerCase()
+          )
+        ) {
           items[i].remove();
           continue;
         }
@@ -149,13 +165,23 @@ function removeNotifications(users) {
       if (
         items[i].getElementsByClassName("title")[0].innerText ===
           "Private conversation" &&
-        users.includes(items[i].getElementsByClassName("user")[0].innerText)
+        users.includes(
+          items[i]
+            .getElementsByClassName("user")[0]
+            .innerText.trim()
+            .toLowerCase()
+        )
       ) {
         items[i].remove();
         // MODELS
       } else if (
         items[i].getElementsByClassName("image-container").length === 1 &&
-        users.includes(items[i].getElementsByClassName("user")[0].innerText)
+        users.includes(
+          items[i]
+            .getElementsByClassName("user")[0]
+            .innerText.trim()
+            .toLowerCase()
+        )
       ) {
         items[i].remove();
       }
@@ -163,17 +189,18 @@ function removeNotifications(users) {
   }
 }
 
-function removeThreadNotifications(thread) {
+function removeById(ids) {
   const items = document.getElementsByClassName("notification");
   if (items.length !== 0) {
     for (let i = items.length - 1; i >= 0; i--) {
-      // THREADS
-      if (
-        items[i].getElementsByClassName("icon-container").length === 1 &&
-        thread.includes(items[i].getElementsByClassName("title")[0].innerText)
-      ) {
-        items[i].remove();
-      }
+      const href = items[i].getElementsByClassName("title")[0].href;
+
+      let id;
+      if (href.includes("models")) id = href.split("/")[5];
+      else if (href.includes("topic")) id = href.split("/")[6];
+      else continue;
+
+      if (ids.includes(id)) items[i].remove();
     }
   }
 }

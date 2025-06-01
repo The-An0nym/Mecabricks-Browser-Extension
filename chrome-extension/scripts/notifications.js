@@ -129,13 +129,13 @@ function sameOrigin(notif1, notif2) {
 
 async function checkNotifications() {
   const sHiddenUsers = await chrome.storage.sync.get("hiddenUsers");
-  const sHiddenThreads = await chrome.storage.sync.get("hiddenThreads");
+  const sHidIds = await chrome.storage.sync.get("hidden_id_name");
   const sHideDeletedUsers = await chrome.storage.sync.get("hideDeletedUsers");
   const hidUsers = sHiddenUsers.hiddenUsers;
-  const hidThreads = sHiddenThreads.hiddenThreads;
+  const hidIds = sHidIds.hidden_id_name.ids;
   const hideDelUsers = sHideDeletedUsers.hideDeletedUsers;
 
-  if (!hidUsers && !hidThreads && !hideDelUsers) return;
+  if (!hidUsers && !hidIds && !hideDelUsers) return;
 
   const sNotificationsHistory0 = await chrome.storage.sync.get(
     "notificationHistory0"
@@ -160,7 +160,7 @@ async function checkNotifications() {
 
   console.log(notifications);
 
-  if (await allNotificationsBlocked(notifications, hidUsers, hidThreads)) {
+  if (await allNotificationsBlocked(notifications, hidUsers, hidIds)) {
     const completeNotifsHistory = await getNotificationHistory();
     setNotificationHistory(notifications.concat(completeNotifsHistory));
     clearNotifications();
@@ -194,18 +194,29 @@ async function getNewNotifications(notifHistory0) {
   }
 }
 
-async function allNotificationsBlocked(notifications, hidUsers, hidThreads) {
+async function allNotificationsBlocked(notifications, hidUsers, hidIds) {
   for (const notif of notifications) {
-    if (notif.senders.users.every((u) => hidUsers.includes(u.name))) continue;
+    if (
+      notif.senders.users.every((u) =>
+        hidUsers.includes(u.name.trim().toLowerCase())
+      )
+    )
+      continue;
     // In future this may be handled via ID instead of title name
     if (notif.code === 1020) {
-      if (hidThreads) if (hidThreads.includes(notif.topic.title)) continue;
+      if (hidIds) if (hidIds.includes(notif.topic.id)) continue;
     } else if ([1010, 1011, 1012].includes(notif.code)) {
-      if (hidUsers.includes(notif.model.user.name)) continue;
+      if (hidIds) if (hidIds.includes(notif.model.alphanumId)) continue;
+      if (hidUsers.includes(notif.model.user.name.trim().toLowerCase()))
+        continue;
     }
 
     // Check if any sender is spam
-    if (!notif.senders.users.some((u) => hidUsers.includes(u.name)))
+    if (
+      !notif.senders.users.some((u) =>
+        hidUsers.includes(u.name.trim().toLowerCase())
+      )
+    )
       return false;
     // Check if single sender -> If not, it should have `continued` before
     if (notif.senders.users.length === 1) return false;
@@ -225,8 +236,12 @@ async function newSendersBlocked(notif, hidUsers) {
     if (!notifBlock[histKey]) return false; // As not every is blocked, there will be a new non-hidden user
     for (const oldNotif of notifBlock[histKey]) {
       if (!sameOrigin(oldNotif, notif)) continue;
-      const oldSenders = oldNotif.senders.users.map((u) => u.name);
-      const newSenders = notif.senders.users.map((u) => u.name);
+      const oldSenders = oldNotif.senders.users.map((u) =>
+        u.name.trim().toLowerCase()
+      );
+      const newSenders = notif.senders.users.map((u) =>
+        u.name.trim().toLowerCase()
+      );
 
       // Newest sender HAS to be hidUser
       if (!hidUsers.includes(newSenders[0])) return false;
@@ -249,7 +264,7 @@ async function newSendersBlocked(notif, hidUsers) {
         return false;
 
       // Store datetimes so that the notifications can also be hidden in the notifications tab
-      blackListDateTime(notif.datetime);
+      blackListNotifications(notif);
 
       return true;
     }
@@ -259,12 +274,19 @@ async function newSendersBlocked(notif, hidUsers) {
   return false;
 }
 
-async function blackListDateTime(datetime) {
-  const preList = await chrome.storage.sync.get("datetimeBlacklist");
+async function blackListNotifications(notif) {
+  const preList = await chrome.storage.sync.get("idBlacklist");
   const obj = {};
-  if (preList.datetimeBlacklist)
-    obj.datetimeBlackList = preList.datetimeBlackList.push(datetime);
-  else obj.datetimeBlackList = [datetime];
+
+  let id;
+
+  if ([1010, 1011, 1012].includes(notif.code)) id = notif.model.alphanumId;
+  else if (notif.code === 1020) id = notif.topic.id;
+  else if (notif.code === 1030) id = notif.chat.alphanumId;
+  else return;
+
+  if (preList.idBlacklist) obj.idBlackList = preList.idBlackList.push(id);
+  else obj.idBlackList = [id];
   chrome.storage.sync.set(obj);
 }
 
