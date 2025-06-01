@@ -246,3 +246,18 @@ async function removeId(id, name) {
 
   chrome.storage.sync.set(obj);
 }
+
+/* UNSUPPORTED NAMES RED */
+function validUsername(eles) {
+  if (!eles.length) return;
+  for (const ele of eles) {
+    const username = ele.textContent;
+    if (/^[A-z0-9_.-]+$/g.test(username)) continue;
+    ele.style.color = "#d00";
+  }
+}
+
+if (url.includes("models"))
+  validUsername(document.getElementsByClassName("author"));
+if (url.includes("library") || url.includes("topic"))
+  validUsername(document.getElementsByClassName("username"));

@@ -204,7 +204,7 @@ async function allNotificationsBlocked(notifications, hidUsers, hidIds) {
       continue;
     // In future this may be handled via ID instead of title name
     if (notif.code === 1020) {
-      if (hidIds) if (hidIds.includes(notif.topic.id)) continue;
+      if (hidIds) if (hidIds.includes(JSON.stringify(notif.topic.id))) continue;
     } else if ([1010, 1011, 1012].includes(notif.code)) {
       if (hidIds) if (hidIds.includes(notif.model.alphanumId)) continue;
       if (hidUsers.includes(notif.model.user.name.trim().toLowerCase()))

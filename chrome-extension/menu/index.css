@@ -1,3 +1,11 @@
+body {
+  font: 400 0.75rem "Open Sans", sans-serif;
+}
+
+.info-text {
+  font-size: 0.8em;
+}
+
 #workshop {
   display: none;
 }
@@ -39,6 +47,11 @@ input {
 .toggable {
   display: flex;
   justify-content: space-between;
+}
+
+.toggable > span {
+  top: 4px;
+  position: relative;
 }
 
 /* The switch - the box around the slider */
@@ -127,6 +140,7 @@ input:checked + .slider:before {
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid #555;
+  margin-top: 10px;
 }
 
 .hidden-user-wrapper > span,
@@ -138,10 +152,13 @@ input:checked + .slider:before {
 }
 
 .delete {
-  width: 28px;
+  width: 22px;
   background-color: #f44;
   user-select: none;
   -webkit-user-select: none;
+  position: relative;
+  bottom: 5px;
+  font-size: 0.8em;
 }
 
 /* SVG */

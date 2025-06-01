@@ -24,6 +24,7 @@ https://chromewebstore.google.com/detail/mecabricks-chrome-extensi/endjoodhbfgmd
 - Fixes "next" page for library queries containing quotes
 - Fixes emojis on the user's comment history and emojis page
 - Option to have an un-numbered notification badge
+- Invalid usernames (outside of A-z 0-9 and \_ . -) will be displayed as red
 - BBcode formatting pop-up for when writing:
   - Posts (includes thread post)
   - Messages

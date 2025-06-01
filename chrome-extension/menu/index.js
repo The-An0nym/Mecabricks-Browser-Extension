@@ -1,6 +1,5 @@
 // To do:
 // Clean up, maybe re-use functions?
-// Re-use storage?
 // Fix css (use classes over IDs)
 
 const hidUserToggle = document.getElementById("del_user");
@@ -54,6 +53,14 @@ function options() {
   document.getElementById("hidden-ids").style.display = "none";
 }
 
+/* INFO TEXT */
+function createInfoText(ele, text) {
+  const span = document.createElement("span");
+  span.className = "info-text";
+  span.textContent = text;
+  ele.appendChild(span);
+}
+
 /* HIDDEN USERS */
 
 function listHiddenUsers() {
@@ -61,6 +68,7 @@ function listHiddenUsers() {
   document.getElementById("hidden-users").style.display = "flex";
   const usersWrapper = document.getElementById("users-wrapper");
   chrome.storage.sync.get("hiddenUsers", (data) => {
+    usersWrapper.innerHTML = "";
     if (data.hiddenUsers) {
       if (data.hiddenUsers.length !== 0) {
         // Enforce that wrapper is empty
@@ -68,7 +76,7 @@ function listHiddenUsers() {
         const hidUsers = data.hiddenUsers;
         for (const user of hidUsers) {
           wrapper = document.createElement("span");
-          wrapper.className = "hidden-user-wrapper item";
+          wrapper.className = "hidden-user-wrapper";
 
           const span = document.createElement("span");
           span.textContent = user;
@@ -85,18 +93,10 @@ function listHiddenUsers() {
           usersWrapper.appendChild(wrapper);
         }
       } else {
-        // Enforce that wrapper is empty
-        usersWrapper.innerHTML = "";
-        const span = document.createElement("span");
-        span.textContent = "You have no hidden users...";
-        usersWrapper.appendChild(span);
+        createInfoText(usersWrapper, "🛈 You have not hidden any users yet...");
       }
     } else {
-      // Enforce that wrapper is empty
-      usersWrapper.innerHTML = "";
-      const span = document.createElement("span");
-      span.textContent = "You have no hidden users...";
-      usersWrapper.appendChild(span);
+      createInfoText(usersWrapper, "🛈 You have not hidden any users yet...");
     }
   });
 }
@@ -160,9 +160,7 @@ async function listIdNames() {
   idsWrapper.innerHTML = "";
 
   if (!hidden.hidden_id_name) {
-    const span = document.createElement("span");
-    span.textContent = "You have no unsubscribed things...";
-    threadsWrapper.appendChild(span);
+    createInfoText(idsWrapper, "🛈 You have not unsubscribed anything yet...");
     return;
   }
 
@@ -170,9 +168,7 @@ async function listIdNames() {
     !hidden.hidden_id_name.ids.length ||
     !hidden.hidden_id_name.names.length
   ) {
-    const span = document.createElement("span");
-    span.textContent = "You have no unsubscribed things...";
-    idsWrapper.appendChild(span);
+    createInfoText(idsWrapper, "🛈 You have not unsubscribed anything yet...");
     return;
   }
 
@@ -202,6 +198,7 @@ async function listIdNames() {
 
     const span = document.createElement("span");
     span.textContent = hidden.hidden_id_name.names[i];
+    span.title = hidden.hidden_id_name.names[i];
     textSVGWrapper.appendChild(span);
 
     wrapper.appendChild(textSVGWrapper);

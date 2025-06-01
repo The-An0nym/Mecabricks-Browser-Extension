@@ -139,16 +139,21 @@ function removeNotifications(users) {
     for (let i = items.length - 1; i >= 0; i--) {
       // SENDERS (in case of singular notifications, i.e. unique like or comment)
       if (items[i].querySelector(".senders > a")) {
-        if (
-          users.includes(
-            items[i]
-              .querySelector(".senders > a")
-              .innerText.trim()
-              .toLowerCase()
-          )
-        ) {
-          items[i].remove();
-          continue;
+        const eles = items[i]
+          .getElementsByClassName("senders")[0]
+          .getElementsByTagName("a");
+        if (eles.length === 1) {
+          if (users.includes(eles[0].innerText.trim().toLowerCase())) {
+            items[i].remove();
+            continue;
+          }
+        }
+        for (let i = eles.length - 1; i >= 0; i--) {
+          if (users.includes(eles[i].innerText.trim().toLowerCase())) {
+            if (eles[i].nextSibling.textContent === ", ")
+              eles[i].nextSibling.remove();
+            eles[i].remove();
+          }
         }
       }
 
