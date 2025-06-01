@@ -1,14 +1,8 @@
 // Hide deleted users
 chrome.storage.sync.get("hideDeletedUsers", (data) => {
-  if (!data.hideDeletedUsers) {
-    return;
-  }
-  if (url.includes("models")) {
-    removeComments([""]);
-  }
-  if (url.includes("topic")) {
-    removePosts([""]);
-  }
+  if (!data.hideDeletedUsers) return;
+  if (url.includes("models")) removeComments([""]);
+  if (url.includes("topic")) removePosts([""]);
 });
 
 // Numbered notifications
@@ -63,12 +57,9 @@ chrome.storage.sync.get("hiddenUsers", (data) => {
 
 // Hide threads
 chrome.storage.sync.get("hidden_id_name", (data) => {
-  if (!data.hidden_id_name) {
-    return;
-  }
-  if (data.hidden_id_name.length === 0) {
-    return;
-  }
+  if (!data.hidden_id_name) return;
+  if (data.hidden_id_name.length === 0) return;
+
   if (url.includes("notifications")) {
     const targetNode = document.getElementById("notifications");
     const config = { childList: true };

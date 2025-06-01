@@ -178,18 +178,33 @@ async function listIdNames() {
 
   for (let i = 0; i < hidden.hidden_id_name.ids.length; i++) {
     wrapper = document.createElement("span");
+    wrapper.className = "hidden-ids-wrapper";
+
+    const textSVGWrapper = document.createElement("span");
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "item-svg");
+    svg.setAttribute("viewBox", "0 0 200 200");
+
+    const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+
     if (
       !isNaN(hidden.hidden_id_name.ids[i]) &&
       hidden.hidden_id_name.ids[i].length < 10
     ) {
-      wrapper.className = "hidden-ids-wrapper item thread-item";
+      use.setAttribute("href", "#thread-svg");
     } else {
-      wrapper.className = "hidden-ids-wrapper item model-item";
+      use.setAttribute("href", "#model-svg");
     }
 
-    span = document.createElement("span");
+    svg.appendChild(use);
+    textSVGWrapper.appendChild(svg);
+
+    const span = document.createElement("span");
     span.textContent = hidden.hidden_id_name.names[i];
-    wrapper.appendChild(span);
+    textSVGWrapper.appendChild(span);
+
+    wrapper.appendChild(textSVGWrapper);
 
     const del = document.createElement("span");
     del.textContent = "✖";

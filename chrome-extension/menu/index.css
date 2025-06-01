@@ -144,10 +144,17 @@ input:checked + .slider:before {
   -webkit-user-select: none;
 }
 
-.thread-item {
-  background-color: #efe;
+/* SVG */
+.master-svg {
+  width: 200;
+  height: 200;
+  display: none;
 }
 
-.model-item {
-  background-color: #eef;
+.item-svg {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  padding-right: 4px;
+  border-right: 1px solid #555;
 }
