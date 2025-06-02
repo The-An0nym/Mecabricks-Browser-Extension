@@ -29,12 +29,18 @@ if (pathname.includes("comments")) fixEmojisComments();
 if (pathname.includes("emojis")) fixEmojisPage();
 
 // Only allow specific pages & check if page has textarea
-if (!pathname.includes("user") && pathname.includes("models")) {
-  // appendContent.js
-  modelSubButton();
-  validUsername(document.getElementsByClassName("author"));
-  commentCharLimit();
-  if (["topic", "category", "messages"].some((s) => pathname.includes(s))) {
+if (!pathname.includes("user")) {
+  if (pathname.includes("models")) {
+    // appendContent.js
+    modelSubButton();
+    validUsername(document.getElementsByClassName("author"));
+    commentCharLimit();
+  }
+  if (
+    ["models", "topic", "category", "messages"].some((s) =>
+      pathname.includes(s)
+    )
+  ) {
     formattingSetup();
   }
 }
