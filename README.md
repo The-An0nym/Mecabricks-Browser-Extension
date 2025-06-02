@@ -56,5 +56,14 @@ https://chromewebstore.google.com/detail/mecabricks-chrome-extensi/endjoodhbfgmd
 
 ## Images
 
-![Browser extension menu with the options to hide deleted users, display notifications as numbered and to manage hidden users](https://github.com/user-attachments/assets/6e2d0395-df2d-47bd-94e0-ec37c73f9b72)
-![Image displayed in the background of the Mecabricks workshop with an open image menu](https://github.com/user-attachments/assets/9d0cd8f4-c6b8-44da-a04f-9fbdf5b64169)
+![main-menu](https://github.com/user-attachments/assets/50853d5f-07fd-4024-bc7a-f1c851d61e68)
+---
+![unsubbed-menu](https://github.com/user-attachments/assets/703cc34b-7884-45ba-9699-87b295f43829)
+---
+![comments](https://github.com/user-attachments/assets/263f22e9-bf1b-4679-999b-135857b51af6)
+---
+![forum-unsub](https://github.com/user-attachments/assets/751c439b-6e0b-4fc9-8b1f-f29dcb0f2461)
+---
+![workshop-images](https://github.com/user-attachments/assets/f5443997-de52-44a2-a982-77ded4d9bf88)
+
+
