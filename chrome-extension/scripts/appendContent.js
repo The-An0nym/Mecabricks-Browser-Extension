@@ -102,15 +102,11 @@ function formattingSetup() {
   }
 }
 
-// Only allow specific pages & check if page has textarea
-if (["models", "topic", "category", "messages"].some((s) => url.includes(s))) {
-  formattingSetup();
-}
-
 // For model editor
 function privateLibrarySetup() {
   const ta = document.getElementById("properties-description");
   if (!ta) return;
+
   // Make description box vertically extenable
   ta.style.resize = "vertical";
   ta.style.minHeight = "120px";
@@ -120,7 +116,7 @@ function privateLibrarySetup() {
   ta.parentNode.style.paddingBottom = "0"; // Remove thicker bottom edge
   ta.parentNode.style.width = "660px";
 
-  /* Character Limit */
+  // Character Limit
   const div = document.createElement("div");
   div.textContent = ta.value.length + "/5000";
   div.className = "model-character-limit";
@@ -136,7 +132,23 @@ function privateLibrarySetup() {
   setUpBBCodeFormatter([ta]);
 }
 
-if (url.includes("account/library")) {
+function commentCharLimit() {
+  const ta = document.getElementById("comments-new-input");
+  // Character Limit
+  const div = document.createElement("div");
+  div.textContent = ta.value.length + "/500";
+  div.className = "comment-character-limit";
+
+  ta.parentNode.appendChild(div);
+
+  ta.addEventListener("keyup", () => {
+    div.textContent = ta.value.length + "/500";
+    if (ta.value.length > 500) div.style.color = "#ed1c24";
+    else div.style.color = "#000";
+  });
+}
+
+function setupAccLibraryListener() {
   const config = { childList: true };
   const targetNode = document.getElementById("gallery-content");
   const observer = new MutationObserver(privateLibrarySetup);
@@ -145,7 +157,6 @@ if (url.includes("account/library")) {
 
 /* BLOCK MECHANISM */
 
-if (url.includes("topic")) threadSubButton();
 async function threadSubButton() {
   const navBar = document.getElementById("nav-bar");
   const button = document.createElement("button");
@@ -173,7 +184,6 @@ async function threadSubButton() {
   navBar.appendChild(button);
 }
 
-if (url.includes("/models/")) modelSubButton();
 async function modelSubButton() {
   const comment = document.getElementById("comments-qty");
   const button = document.createElement("button");
@@ -268,8 +278,3 @@ function validUsername(eles) {
     ele.style.color = "#d00";
   }
 }
-
-if (url.includes("/models/"))
-  validUsername(document.getElementsByClassName("author"));
-if (url.includes("library") || url.includes("topic"))
-  validUsername(document.getElementsByClassName("username"));

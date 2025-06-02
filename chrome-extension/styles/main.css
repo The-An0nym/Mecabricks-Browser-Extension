@@ -161,3 +161,17 @@ a > .notifications {
   border-radius: 0 0 5px 5px;
   font-weight: 800;
 }
+
+.comment-character-limit {
+  color: #000;
+  position: absolute;
+  width: 70px;
+  margin-top: -0.6px;
+  margin-left: 618px;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 0 0 5px 5px;
+  font-weight: 800;
+  border: 1px solid #c4cdd7;
+  border-top: none;
+}

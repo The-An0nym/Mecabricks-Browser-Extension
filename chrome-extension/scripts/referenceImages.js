@@ -1,5 +1,3 @@
-if (url.includes("workshop")) appendContent();
-
 const imgsList = []; // This will hold a list of JSON (meta)data for our images
 
 /* IMAGE FUNCTIONS */
@@ -134,7 +132,7 @@ function removeImage(e) {
 }
 
 /* APPEND IMAGES MENU BUTTON */
-function appendContent() {
+function appendImageMenu() {
   menuOption = createMenuOption();
   menuPanel = createMenuPanel();
 

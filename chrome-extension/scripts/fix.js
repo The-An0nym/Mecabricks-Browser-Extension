@@ -1,7 +1,5 @@
-const url = window.location.href;
-
 // Fixing emojis
-if (url.includes("comments")) {
+function fixEmojisComments() {
   const x = document.getElementsByClassName("emoji"); // Get Emoji elements
   for (let i = 0; i < x.length; i++) {
     let y = x[i].src;
@@ -10,7 +8,7 @@ if (url.includes("comments")) {
   }
 }
 
-if (url.includes("emojis")) {
+function fixEmojisPage() {
   const x = document.getElementsByClassName("image"); // Get Emoji elements
   for (let i = 0; i < x.length; i++) {
     let y = x[i].childNodes[0].src;
@@ -23,7 +21,7 @@ if (url.includes("emojis")) {
 }
 
 // Fixing search with quotation marks
-if (url.includes("library") && url.includes("%22")) {
+function fixQuotesSearch() {
   const prev = document.getElementsByClassName("button sprite-gallery prev")[0];
   const next = document.getElementsByClassName("button sprite-gallery next")[0];
 

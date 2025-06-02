@@ -76,7 +76,7 @@ function listHiddenUsers() {
         const hidUsers = data.hiddenUsers;
         for (const user of hidUsers) {
           wrapper = document.createElement("span");
-          wrapper.className = "hidden-user-wrapper";
+          wrapper.className = "items-wrapper";
 
           const span = document.createElement("span");
           span.textContent = user;
@@ -174,7 +174,7 @@ async function listIdNames() {
 
   for (let i = 0; i < hidden.hidden_id_name.ids.length; i++) {
     wrapper = document.createElement("span");
-    wrapper.className = "hidden-ids-wrapper";
+    wrapper.className = "items-wrapper";
 
     const textSVGWrapper = document.createElement("span");
 

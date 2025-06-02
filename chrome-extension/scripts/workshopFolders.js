@@ -21,12 +21,6 @@ function reOrderFolders() {
   eles2[0].done = true;
 }
 
-if (url.includes("workshop")) {
-  document
-    .getElementById("menu-import")
-    .addEventListener("mouseup", () => setTimeout(menuImpClicked, 100));
-}
-
 function menuImpClicked() {
   document
     .getElementById("import-button")

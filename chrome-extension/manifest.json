@@ -2,13 +2,13 @@
   "manifest_version": 3,
 
   "name": "Mecabricks Chrome Extension",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "icons": {
     "16": "icons/16x16.png",
     "48": "icons/48x48.png",
     "128": "icons/128x128.png"
   },
-  "description": "A chrome extension that improves aspects of Mecabricks and adds some features that grant a nicer user experience.",
+  "description": "An extension that improves aspects of Mecabricks and adds some features that grant a nicer user experience.",
   "action": {
     "default_icon": {
       "16": "icons/16x16.png"
@@ -22,11 +22,12 @@
       "js": [
         "scripts/fix.js",
         "scripts/alert.js",
-        "scripts/bbcode.js",
+        "scripts/appendContent.js",
         "scripts/removeContent.js",
         "scripts/referenceImages.js",
         "scripts/notifications.js",
-        "scripts/workshopFolders.js"
+        "scripts/workshopFolders.js",
+        "scripts/pageOverview.js"
       ],
       "css": ["styles/main.css"],
       "runAt": "document_start",

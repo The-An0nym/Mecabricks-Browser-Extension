@@ -1,6 +1,5 @@
 // TODO:
 // Blacklist necessary?
-
 async function getNotifications(date) {
   const dateTime = encodeURIComponent(date);
   try {
@@ -309,15 +308,4 @@ async function storeLatestNotifications() {
   const oldNotifications = await getNotificationHistory();
 
   setNotificationHistory(newNotifications.concat(oldNotifications));
-}
-
-// Check if there are notifications
-if (url.includes("workshop")) {
-  if (document.querySelector("a > .notifications")) checkNotifications();
-} else if (url.includes("partmanager")) {
-  if (document.querySelector(".user > .notifications")) checkNotifications();
-} else if (url.includes("notifications")) {
-  storeLatestNotifications();
-} else {
-  if (document.querySelector("#header-notifications")) checkNotifications();
 }

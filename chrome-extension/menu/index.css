@@ -122,29 +122,25 @@ input:checked + .slider:before {
   width: min-content;
 }
 
-#hidden-users,
-#hidden-ids {
+.hidden {
   display: none;
 }
 
-#users-wrapper,
-#ids-wrapper {
+.list-wrapper {
   display: flex;
   flex-direction: column;
   max-height: 70vh;
   overflow-y: scroll;
 }
 
-.hidden-user-wrapper,
-.hidden-ids-wrapper {
+.items-wrapper {
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid #555;
   margin-top: 10px;
 }
 
-.hidden-user-wrapper > span,
-.hidden-ids-wrapper > span {
+.items-wrapper > span {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
