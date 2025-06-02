@@ -1,8 +1,8 @@
 function setUpBBCodeFormatter(textAs) {
-  for (const texta of textAs) {
-    //prettier-ignore
-    const fTypes = ["i", "b", "u", "s", "center", "code", "img", "url", "color", "size"];
+  //prettier-ignore
+  const fTypes = ["i", "b", "u", "s", "center", "code", "img", "url", "color", "size"];
 
+  for (const texta of textAs) {
     // Create container with 0px height
     const container = document.createElement("div");
     container.id = "formatting-container";
@@ -97,7 +97,7 @@ function formatSelection(str) {
 // Set texta (textarea) that will be edited -> Should add support for mutliple textareas
 function formattingSetup() {
   const elements = document.getElementsByTagName("textarea");
-  if (elements.length != 0) {
+  if (elements.length !== 0) {
     setUpBBCodeFormatter(elements);
   }
 }
@@ -109,19 +109,31 @@ if (["models", "topic", "category", "messages"].some((s) => url.includes(s))) {
 
 // For model editor
 function privateLibrarySetup() {
-  const item = document.getElementById("properties");
-  if (item) {
-    // Make description box vertically extenable
-    const ta = item.getElementsByTagName("textarea");
-    ta[0].style.resize = "vertical";
-    ta[0].style.minHeight = "120px";
-    ta[0].style.maxHeight = "480px";
-    ta[0].style.width = "640px";
-    ta[0].parentNode.style.height = "auto";
-    ta[0].parentNode.style.paddingBottom = "0"; // Remove thicker bottom edge
-    ta[0].parentNode.style.width = "660px";
-    if (window - properties) setUpBBCodeFormatter(ta);
-  }
+  const ta = document.getElementById("properties-description");
+  if (!ta) return;
+  // Make description box vertically extenable
+  ta.style.resize = "vertical";
+  ta.style.minHeight = "120px";
+  ta.style.maxHeight = "480px";
+  ta.style.width = "640px";
+  ta.parentNode.style.height = "auto";
+  ta.parentNode.style.paddingBottom = "0"; // Remove thicker bottom edge
+  ta.parentNode.style.width = "660px";
+
+  /* Character Limit */
+  const div = document.createElement("div");
+  div.textContent = ta.value.length + "/5000";
+  div.className = "model-character-limit";
+
+  ta.parentNode.appendChild(div);
+
+  ta.addEventListener("keyup", () => {
+    div.textContent = ta.value.length + "/5000";
+    if (ta.value.length > 5000) div.style.color = "#ed1c24";
+    else div.style.color = "#fff";
+  });
+
+  setUpBBCodeFormatter([ta]);
 }
 
 if (url.includes("account/library")) {
@@ -161,7 +173,7 @@ async function threadSubButton() {
   navBar.appendChild(button);
 }
 
-if (url.includes("models")) modelSubButton();
+if (url.includes("/models/")) modelSubButton();
 async function modelSubButton() {
   const comment = document.getElementById("comments-qty");
   const button = document.createElement("button");
@@ -257,7 +269,7 @@ function validUsername(eles) {
   }
 }
 
-if (url.includes("models"))
+if (url.includes("/models/"))
   validUsername(document.getElementsByClassName("author"));
 if (url.includes("library") || url.includes("topic"))
   validUsername(document.getElementsByClassName("username"));

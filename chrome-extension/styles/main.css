@@ -148,3 +148,16 @@ a > .notifications {
   display: flex;
   justify-content: space-between;
 }
+
+/* Character Limit*/
+.model-character-limit {
+  color: #fff;
+  position: absolute;
+  width: 70px;
+  margin-top: -3.2px;
+  margin-left: 593px;
+  text-align: center;
+  background-color: #34495e;
+  border-radius: 0 0 5px 5px;
+  font-weight: 800;
+}
