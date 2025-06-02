@@ -161,8 +161,7 @@ async function threadSubButton() {
   const navBar = document.getElementById("nav-bar");
   const button = document.createElement("button");
 
-  const urlList = url.split("/");
-  const id = urlList[urlList.indexOf("topic") + 1];
+  const id = pathname[pathname.indexOf("topic") + 1];
   const name = navBar.getElementsByTagName("b")[0].textContent;
   if (await unsubscribed(id)) {
     button.addEventListener("mouseup", async () => {
@@ -188,7 +187,7 @@ async function modelSubButton() {
   const comment = document.getElementById("comments-qty");
   const button = document.createElement("button");
 
-  const id = url.split("/").pop();
+  const id = pathname[pathname.length - 1];
   const name = document.getElementsByClassName("name")[0].textContent;
   if (await unsubscribed(id)) {
     button.addEventListener("mouseup", async () => {

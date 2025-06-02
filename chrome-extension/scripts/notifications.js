@@ -106,9 +106,9 @@ function normalizeList(notifications) {
 
 function clearNotifications() {
   fetch("/en/account/notifications");
-  if (url.includes("workshop")) {
+  if (pathname.includes("workshop")) {
     document.querySelector("a > .notifications").remove();
-  } else if (url.includes("partmanager")) {
+  } else if (pathname.includes("partmanager")) {
     document.querySelector(".user > .notifications").remove();
   } else {
     if (document.querySelector("#header-notifications"))
@@ -159,8 +159,6 @@ async function checkNotifications() {
   if (hideDelUsers) {
     hidUsers.push("");
   }
-
-  console.log(notifications);
 
   if (await allNotificationsBlocked(notifications, hidUsers, hidIds)) {
     const completeNotifsHistory = await getNotificationHistory();

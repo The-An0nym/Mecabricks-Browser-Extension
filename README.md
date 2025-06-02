@@ -46,7 +46,7 @@ https://chromewebstore.google.com/detail/mecabricks-chrome-extensi/endjoodhbfgmd
 **WORKSHOP**
 
 - Allows users to select the part reference in the Workshop when selecting a part
-- Allows importing and displaying of reference image (displayed in the workshop background)
+- Allows importing and displaying of reference image (displayed in the workshop background) (Supported: .png, .jpg, .webp, .gif)
 - Hoists folders on the import screen for Mecabricks models to the top
   <br><br>
 

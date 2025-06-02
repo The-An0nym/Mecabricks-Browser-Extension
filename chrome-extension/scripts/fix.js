@@ -26,8 +26,8 @@ function fixQuotesSearch() {
   const next = document.getElementsByClassName("button sprite-gallery next")[0];
 
   if (!prev.outerHTML.includes("disabled")) {
-    let x = url;
-    if (url.includes("&page=")) {
+    let x = fullUrl;
+    if (fullUrl.includes("&page=")) {
       let y = x.split("&page=");
       let z = parseInt(y[1]);
       z--;
@@ -37,8 +37,8 @@ function fixQuotesSearch() {
   }
 
   if (!next.outerHTML.includes("disabled")) {
-    let x = url;
-    if (url.includes("&page=")) {
+    let x = fullUrl;
+    if (fullUrl.includes("&page=")) {
       let y = x.split("&page=");
       let z = parseInt(y[1]);
       z++;
