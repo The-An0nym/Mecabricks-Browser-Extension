@@ -13,7 +13,7 @@ https://chromewebstore.google.com/detail/mecabricks-chrome-extensi/endjoodhbfgmd
 **COMMUNITY**
 
 - Option to have an un-numbered notification badge
-- Removes overlay from errors (ensures you can still click buttons even if an error pop-up is displaying)
+- Invalid usernames (outside of A-z 0-9 and \_ . -) will be displayed as red
 - Ability to unsubscribe from threads and or comment sections
 - Ability to hide deleted users (= users without username)
 - Ability to hide users (any), hiding these user's:
@@ -31,7 +31,7 @@ https://chromewebstore.google.com/detail/mecabricks-chrome-extensi/endjoodhbfgmd
 
 - Fixes "next" page for library queries containing quotes
 - Fixes emojis on the user's comment history and emojis page
-- Invalid usernames (outside of A-z 0-9 and \_ . -) will be displayed as red
+- Removes overlay from errors (ensures you can still click buttons even if an error pop-up is displaying)
 - BBcode formatting pop-up for when writing:
   - Posts (includes thread post)
   - Messages
