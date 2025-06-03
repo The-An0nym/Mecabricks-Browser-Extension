@@ -57,8 +57,8 @@ async function loadUntilDateTime(max) {
 }
 
 async function loadHistory() {
-  const threeWeeksAgo = Date.parse(new Date()) - 24 * 3600 * 1000 * 21;
-  const notifications = await loadUntilDateTime(threeWeeksAgo);
+  const twoWeeksAgo = Date.parse(new Date()) - 24 * 3600 * 1000 * 14;
+  const notifications = await loadUntilDateTime(twoWeeksAgo);
 
   setNotificationHistory(notifications, false);
 }
@@ -91,7 +91,7 @@ function normalizeList(notifications) {
     const n1 = notifications[i];
     const now = Date.parse(new Date()); // Now
     const past = Date.parse(n1.datetime);
-    if ((now - past) / (24 * 3600 * 1000) > 21) {
+    if ((now - past) / (24 * 3600 * 1000) > 14) {
       // Delete n1
       notifications.splice(i, 1);
       continue;
