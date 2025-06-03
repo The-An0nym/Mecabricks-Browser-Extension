@@ -21,6 +21,11 @@ input {
   padding: 4px;
 }
 
+#options > .item {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 7px;
+}
+
 .button {
   margin: 2px 0;
   padding: 4px;

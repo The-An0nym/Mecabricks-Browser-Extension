@@ -123,10 +123,10 @@ a > .notifications {
 .block-button {
   background-color: #e9eff4;
   color: #414243;
-  padding: 3px;
+  padding: 4px;
   min-width: 25px;
   font-size: 0.8em;
-  font-weight: 800;
+  font-size: 14px;
   border-radius: 3px;
   border: none;
   cursor: pointer;
