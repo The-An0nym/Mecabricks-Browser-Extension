@@ -156,9 +156,7 @@ async function checkNotifications() {
     return;
   }
 
-  if (hideDelUsers) {
-    hidUsers.push("");
-  }
+  if (hideDelUsers) hidUsers.push("");
 
   if (await allNotificationsBlocked(notifications, hidUsers, hidIds)) {
     const completeNotifsHistory = await getNotificationHistory();

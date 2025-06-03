@@ -16,7 +16,7 @@ function setUpBBCodeFormatter(textAs) {
     for (let type of fTypes) {
       let button = document.createElement("button");
       button.innerHTML = type;
-      button.addEventListener("mousedown", () => formatSelection(type));
+      button.addEventListener("mousedown", () => formatSelection(type, texta));
       button.className = "formatting-button";
       div.appendChild(button);
     }
@@ -39,7 +39,7 @@ function setUpBBCodeFormatter(textAs) {
 
 // Check if text has been selected in textarea
 function checkSelection(container, e, removeWhiteSpace) {
-  texta = e.target;
+  const texta = e.target;
   const textSelection = window.getSelection().toString();
   if (textSelection === "") {
     container.style.display = "none";
@@ -62,7 +62,7 @@ function checkSelection(container, e, removeWhiteSpace) {
 }
 
 // Add BBCode to user input
-function formatSelection(str) {
+function formatSelection(str, texta) {
   const tv = texta.value;
   const start = texta.selectionStart;
   const end = texta.selectionEnd;
@@ -79,19 +79,24 @@ function formatSelection(str) {
     str0 += "]"; // [url=]{content} or [color=]{content}
   }
 
-  //prettier-ignore
-  texta.value = tv.slice(0, start) + str0 + tv.slice(start, end) + str1 + tv.slice(end);
-  texta.select();
+  texta.value =
+    tv.slice(0, start) + str0 + tv.slice(start, end) + str1 + tv.slice(end);
 
-  // Mouse cursor or selection
-  if (editable && http) {
-    texta.selectionStart = texta.selectionEnd = end + str0.length + 1;
-  } else if (editable) {
-    texta.selectionStart = texta.selectionEnd = start + 2 + str.length;
-  } else {
-    texta.selectionStart = start + 2 + str.length;
-    texta.selectionEnd = end + 2 + str.length;
-  }
+  setTimeout(() => {
+    texta.select();
+    // Mouse cursor or selection
+    if (editable && http) {
+      texta.selectionStart = texta.selectionEnd = end + str0.length + 1;
+    } else if (editable) {
+      texta.selectionStart = texta.selectionEnd = start + 2 + str.length;
+    } else {
+      texta.selectionStart = start + 2 + str.length;
+      texta.selectionEnd = end + 2 + str.length;
+      const e = {};
+      e.target = texta;
+      checkSelection(texta.previousSibling, e, true);
+    }
+  }, 20);
 }
 
 // Set texta (textarea) that will be edited -> Should add support for mutliple textareas

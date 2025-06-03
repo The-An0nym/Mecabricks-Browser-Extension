@@ -29,7 +29,6 @@ function menuImpClicked() {
 
 function impClicked() {
   if (document.getElementsByClassName("nano-content").length) {
-    console.log("triggered");
     const config = { childList: true };
     const targetNode = document.getElementsByClassName("nano-content")[0];
     const observer = new MutationObserver(reOrderFolders);
