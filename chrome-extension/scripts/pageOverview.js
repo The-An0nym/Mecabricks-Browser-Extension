@@ -9,8 +9,16 @@ if (document.title !== "503 Service Unavailable") {
   switch (pathname[0]) {
     case "account": // ACCOUNT
       // appendContent.js
-      if (pathname.includes("library")) setupAccLibraryListener();
-      if (pathname.includes("messages")) formattingSetup();
+      if (pathname[1] === "library") setupAccLibraryListener();
+      if (pathname[1] === "messages") {
+        formattingSetup();
+        const x = new MutationObserver(() => {
+          validUsername(target.getElementsByClassName("username"));
+          x.disconnect();
+        });
+        const target = document.getElementsByClassName("nano-content")[0];
+        x.observe(target, { childList: true });
+      }
       break;
     case "workshop": // WORKSHOP
       appendImageMenu(); // referenceImages.js
@@ -18,7 +26,7 @@ if (document.title !== "503 Service Unavailable") {
       const ele = document.getElementById("menu-import");
       ele.addEventListener("mouseup", () => setTimeout(menuImpClicked, 100));
       // notifications.js
-      let x = new MutationObserver(() => {
+      const x = new MutationObserver(() => {
         if (document.querySelector("a > .notifications")) {
           checkNotifications();
           x.disconnect();
@@ -65,7 +73,7 @@ if (document.title !== "503 Service Unavailable") {
   }
 
   // NOTIFICATIONS
-  if (pathname.includes("notifications")) {
+  if (pathname[1] === "notifications") {
     storeLatestNotifications();
   } else {
     if (document.querySelector("#header-notifications")) checkNotifications();
@@ -74,8 +82,8 @@ if (document.title !== "503 Service Unavailable") {
   // Hide deleted users
   chrome.storage.sync.get("hideDeletedUsers", (data) => {
     if (!data.hideDeletedUsers) return;
-    if (pathname.includes("models")) removeComments([""]);
-    if (pathname.includes("topic")) removePosts([""]);
+    if (pathname[0] === "models") removeComments([""]);
+    if (pathname[1] === "topic") removePosts([""]);
   });
 
   // Numbered notifications
@@ -83,10 +91,7 @@ if (document.title !== "503 Service Unavailable") {
     if (!data.numberedNotifications) {
       document.body.style.setProperty("--font-color", "white");
     } else {
-      if (
-        !pathname.includes("partmanager") &&
-        !pathname.includes("notifications")
-      ) {
+      if (pathname[0] !== "partmanager" && pathname[1] !== "notifications") {
         if (document.getElementById("header-notifications")) {
           badge = document.getElementById("header-notifications");
           badge.innerText = "";
@@ -105,19 +110,19 @@ if (document.title !== "503 Service Unavailable") {
     if (!data.hiddenUsers) return;
     if (data.hiddenUsers.length === 0) return;
 
-    if (pathname.includes("models")) removeComments(data.hiddenUsers);
-    else if (pathname.includes("topic")) removePosts(data.hiddenUsers);
-    else if (pathname.includes("library")) removeModels(data.hiddenUsers);
-    else if (pathname.includes("category")) removeThread(data.hiddenUsers);
+    if (pathname[0] === "models") removeComments(data.hiddenUsers);
+    else if (pathname[1] === "topic") removePosts(data.hiddenUsers);
+    else if (pathname[0] === "library") removeModels(data.hiddenUsers);
+    else if (pathname[1] === "category") removeThread(data.hiddenUsers);
     else {
       const config = { childList: true };
-      if (pathname.includes("messages")) {
+      if (pathname[1] === "messages") {
         const targetNode = document.getElementsByClassName("nano-content")[0];
         const observer = new MutationObserver(() => {
           removeMessages(data.hiddenUsers);
         });
         observer.observe(targetNode, config);
-      } else if (pathname.includes("notifications")) {
+      } else if (pathname[1] === "notifications") {
         const targetNode = document.getElementById("notifications");
         const observer = new MutationObserver(() => {
           removeNotifications(data.hiddenUsers);
@@ -132,7 +137,7 @@ if (document.title !== "503 Service Unavailable") {
     if (!data.hidden_id_name) return;
     if (data.hidden_id_name.length === 0) return;
 
-    if (pathname.includes("notifications")) {
+    if (pathname[1] === "notifications") {
       const targetNode = document.getElementById("notifications");
       const config = { childList: true };
       const observer = new MutationObserver(() => {
