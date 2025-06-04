@@ -1,16 +1,20 @@
 function setUpBBCodeFormatter(textAs) {
   //prettier-ignore
-  const fTypes = ["i", "b", "u", "s", "center", "code", "img", "url", "color", "size"];
+  const fTypes = ["i", "b", "u", "s", "center", "code", "img", "url", "color", "size", "youtube", "mecabricks"];
 
   for (const texta of textAs) {
     // Create container with 0px height
     const container = document.createElement("div");
-    container.id = "formatting-container";
-    container.style.display = "none";
+    container.className = "text-editing-container";
+
+    // Emojis
+    const emoji = document.createElement("div");
+    emoji.className = "emoji-pop-up";
+    container.appendChild(emoji);
 
     // Create pop-up containing buttons
     const div = document.createElement("div");
-    div.id = "formatting-pop-up";
+    div.className = "formatting-pop-up";
 
     // Append buttons to pop-up
     for (let type of fTypes) {
@@ -30,10 +34,15 @@ function setUpBBCodeFormatter(textAs) {
       setTimeout(checkSelection, 10, container, e, true)
     ); // Delay ensures window.getSelection() has time to update properly
     texta.addEventListener("keyup", (e) => checkSelection(container, e, false));
-    texta.addEventListener(
-      "focusout",
-      () => (container.style.display = "none")
-    );
+    const emojiInstance = emojis(emoji);
+    texta.addEventListener("keyup", emojiInstance);
+    texta.addEventListener("mouseup", emojiInstance);
+    texta.addEventListener("focusout", () => {
+      container.getElementsByClassName("formatting-pop-up")[0].style.display =
+        "none";
+      container.getElementsByClassName("emoji-pop-up")[0].style.display =
+        "none";
+    });
   }
 }
 
@@ -41,8 +50,9 @@ function setUpBBCodeFormatter(textAs) {
 function checkSelection(container, e, removeWhiteSpace) {
   const texta = e.target;
   const textSelection = window.getSelection().toString();
+  const formatter = container.getElementsByClassName("formatting-pop-up")[0];
   if (textSelection === "") {
-    container.style.display = "none";
+    formatter.style.display = "none";
     return;
   }
 
@@ -58,7 +68,14 @@ function checkSelection(container, e, removeWhiteSpace) {
       if (texta.selectionEnd === texta.selectionStart) return; // In case a single space was selected
     }
   }
-  container.style.display = "block";
+  formatter.style.display = "block";
+  container.style.position = "";
+  container.style.top = "";
+  bounds = container.getBoundingClientRect();
+  if (bounds.y < 60 || bounds.y > window.innerHeight + 20) {
+    container.style.position = "fixed";
+    container.style.top = "85px";
+  }
 }
 
 // Add BBCode to user input
@@ -98,6 +115,58 @@ function formatSelection(str, texta) {
     }
   }, 20);
 }
+
+// TODO
+// Check for Enter key press?
+const emojis = (popUp) => {
+  return function (e) {
+    popUp.style.display = "none";
+    if (e.target.selectionEnd !== e.target.selectionStart) return;
+    // Check for enter key press
+    const index = e.target.selectionStart;
+    const text = e.target.value;
+    let res = index;
+    for (let i = 1; i < 30; i++) {
+      const char = text[index - i];
+      if (char === ":") {
+        res = index - i + 1;
+        break;
+      } else if (!/[a-z0-9_\+\-]/g.test(char)) return;
+    }
+    if (res === index) return;
+    if (index - res < 2) return;
+    const query = text.slice(res, index);
+    console.log(query);
+
+    popUp.style.display = "block";
+    popUp.innerHTML = "";
+
+    for (const key in emojiList) {
+      if (emojiList[key][0].includes(query)) {
+        const span = document.createElement("span");
+        span.className = "emoji-item";
+        span.title = emojiList[key][0];
+
+        const img = document.createElement("img");
+        img.src = `//cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/${emojiList[key][1]}.svg`;
+        span.appendChild(img);
+
+        span.addEventListener("mousedown", () => {
+          const newText =
+            text.slice(0, res) + emojiList[key][0] + ":" + text.slice(index);
+          console.log(newText);
+          e.target.value = newText;
+          setTimeout(() => {
+            e.target.select();
+            e.target.selectionEnd = e.target.selectionStart =
+              res + emojiList[key][0].length + 1;
+          }, 20);
+        });
+        popUp.appendChild(span);
+      }
+    }
+  };
+};
 
 // Set texta (textarea) that will be edited -> Should add support for mutliple textareas
 function formattingSetup() {

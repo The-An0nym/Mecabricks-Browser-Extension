@@ -1,16 +1,26 @@
 /* FORMATTER */
-#formatting-container {
+.text-editing-container {
   height: 0px;
 }
 
-#formatting-pop-up {
+.emoji-pop-up,
+.formatting-pop-up {
   background-color: #d4dce4;
   width: fit-content;
   height: fit-content;
   position: relative;
   bottom: 35px;
-  left: 100px;
+  left: 0;
+  border: 1px solid #c4cdd7;
   border-radius: 3px;
+  display: none;
+}
+
+.emoji-pop-up {
+  max-width: 100%;
+  overflow-x: scroll;
+  white-space: nowrap;
+  bottom: 55px;
 }
 
 .formatting-button {
@@ -25,6 +35,17 @@
 }
 
 .formatting-button:hover {
+  background-color: white;
+}
+
+.emoji-item {
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+  padding: 5px;
+}
+
+.emoji-item:hover {
   background-color: white;
 }
 
