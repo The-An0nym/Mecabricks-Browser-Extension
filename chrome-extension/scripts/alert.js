@@ -13,3 +13,34 @@ if (document.getElementById("alert-wrapper")) {
   const observer = new MutationObserver(tryRemoval);
   observer.observe(targetNode, config);
 }
+
+async function getTimer() {
+  const data = await chrome.storage.sync.get("lastPost");
+  if (!data.lastPost) return;
+  const datetime = data.lastPost;
+  const now = Date.parse(new Date());
+  if (now - datetime < 1000 * 60) {
+    const timeRemaining = 60000 - (now - datetime);
+    const ele = document.createElement("div");
+    ele.className = "post-timer";
+    ele.textContent = Math.round(timeRemaining / 1000);
+    document.body.prepend(ele);
+    const x = setInterval(update, 100, datetime, ele);
+    setTimeout(() => {
+      ele.remove();
+      clearInterval(x);
+    }, timeRemaining);
+  }
+}
+
+function update(datetime, ele) {
+  const now = Date.parse(new Date());
+  ele.textContent = Math.round(60 - (now - datetime) / 1000);
+}
+
+getTimer();
+
+function setTimer() {
+  const now = Date.parse(new Date());
+  chrome.storage.sync.set({ lastPost: now });
+}

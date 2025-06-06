@@ -59,6 +59,13 @@ if (document.title !== "503 Service Unavailable") {
       validUsername(document.getElementsByClassName("author"));
       commentCharLimit();
       formattingSetup();
+      // Alert.js
+      document
+        .getElementById("comments-new-post")
+        .addEventListener("mouseup", () => {
+          setTimer();
+          getTimer();
+        });
       break;
     case "user": // USER
       if (pathname[2] === "comments") {

@@ -39,6 +39,7 @@ https://chromewebstore.google.com/detail/mecabricks-chrome-extensi/endjoodhbfgmd
   - Model descriptions
 - Increases the model description textarea (input) size and allows it to be vertically increased
 - Character limits indicator for comments and model descriptions
+- Shows a timer whenever posting a comment, counting down from 60 seconds to indicate when you can comment again
   <br><br>
 
 ---
@@ -56,14 +57,12 @@ https://chromewebstore.google.com/detail/mecabricks-chrome-extensi/endjoodhbfgmd
 
 ## Images
 
-![main-menu](https://github.com/user-attachments/assets/50853d5f-07fd-4024-bc7a-f1c851d61e68)
----
-![unsubbed-menu](https://github.com/user-attachments/assets/703cc34b-7884-45ba-9699-87b295f43829)
----
-![comments](https://github.com/user-attachments/assets/263f22e9-bf1b-4679-999b-135857b51af6)
----
-![forum-unsub](https://github.com/user-attachments/assets/751c439b-6e0b-4fc9-8b1f-f29dcb0f2461)
----
+## ![main-menu](https://github.com/user-attachments/assets/50853d5f-07fd-4024-bc7a-f1c851d61e68)
+
+## ![unsubbed-menu](https://github.com/user-attachments/assets/703cc34b-7884-45ba-9699-87b295f43829)
+
+## ![comments](https://github.com/user-attachments/assets/263f22e9-bf1b-4679-999b-135857b51af6)
+
+## ![forum-unsub](https://github.com/user-attachments/assets/751c439b-6e0b-4fc9-8b1f-f29dcb0f2461)
+
 ![workshop-images](https://github.com/user-attachments/assets/f5443997-de52-44a2-a982-77ded4d9bf88)
-
-

@@ -196,3 +196,17 @@ a > .notifications {
   border: 1px solid #c4cdd7;
   border-top: none;
 }
+
+/* TIMER */
+.post-timer {
+  position: fixed;
+  margin-top: 50px;
+  background-color: black;
+  font-size: 1.2em;
+  padding: 4px;
+  min-width: 30px;
+  text-align: center;
+  z-index: 50;
+  border-radius: 0 0 10px 0;
+  color: white;
+}
