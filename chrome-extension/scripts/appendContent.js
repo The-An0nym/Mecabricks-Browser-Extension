@@ -152,7 +152,7 @@ const emojis = (popUp) => {
 };
 
 function emojiTab(e) {
-  if (e.code !== "Tab") return;
+  if (e.code !== "Enter") return;
   const [start, end] = getEmojiStartEnd(e.target);
   if (start === end) return;
   if (end - start < 2) return;
@@ -168,6 +168,7 @@ function getEmojiStartEnd(ele) {
   const end = ele.selectionStart;
   const text = ele.value;
   let start = end;
+  console.log([text]);
   for (let i = 1; i < 30; i++) {
     const char = text[end - i];
     if (char === ":") {
