@@ -116,27 +116,17 @@ function formatSelection(str, texta) {
   }, 20);
 }
 
-// TODO
-// Check for Enter key press?
 const emojis = (popUp) => {
   return function (e) {
+    e.target.removeEventListener("keydown", emojiTab);
     popUp.style.display = "none";
     if (e.target.selectionEnd !== e.target.selectionStart) return;
-    // Check for enter key press
-    const index = e.target.selectionStart;
+
     const text = e.target.value;
-    let res = index;
-    for (let i = 1; i < 30; i++) {
-      const char = text[index - i];
-      if (char === ":") {
-        res = index - i + 1;
-        break;
-      } else if (!/[a-z0-9_\+\-]/g.test(char)) return;
-    }
-    if (res === index) return;
-    if (index - res < 2) return;
-    const query = text.slice(res, index);
-    console.log(query);
+    const [start, end] = getEmojiStartEnd(e.target);
+    if (start === end) return;
+    if (end - start < 2) return;
+    const query = text.slice(start, end);
 
     popUp.style.display = "block";
     popUp.innerHTML = "";
@@ -152,21 +142,51 @@ const emojis = (popUp) => {
         span.appendChild(img);
 
         span.addEventListener("mousedown", () => {
-          const newText =
-            text.slice(0, res) + emojiList[key][0] + ":" + text.slice(index);
-          console.log(newText);
-          e.target.value = newText;
-          setTimeout(() => {
-            e.target.select();
-            e.target.selectionEnd = e.target.selectionStart =
-              res + emojiList[key][0].length + 1;
-          }, 20);
+          insertEmoji(e.target, start, end, emojiList[key][0]);
         });
         popUp.appendChild(span);
       }
     }
+    e.target.addEventListener("keydown", emojiTab);
   };
 };
+
+function emojiTab(e) {
+  if (e.code !== "Tab") return;
+  const [start, end] = getEmojiStartEnd(e.target);
+  if (start === end) return;
+  if (end - start < 2) return;
+
+  const emoji = document.querySelector(".emoji-pop-up > .emoji-item").title;
+  if (!emoji) return;
+
+  e.preventDefault();
+  insertEmoji(e.target, start, end, emoji);
+}
+
+function getEmojiStartEnd(ele) {
+  const end = ele.selectionStart;
+  const text = ele.value;
+  let start = end;
+  for (let i = 1; i < 30; i++) {
+    const char = text[end - i];
+    if (char === ":") {
+      start = end - i + 1;
+      break;
+    } else if (!/[a-z0-9_\+\-]/g.test(char)) return [0, 0];
+  }
+  return [start, end];
+}
+
+function insertEmoji(tar, start, end, emoji) {
+  const text = tar.value;
+  const newText = text.slice(0, start) + emoji + ":" + text.slice(end);
+  tar.value = newText;
+  setTimeout(() => {
+    tar.select();
+    tar.selectionEnd = tar.selectionStart = end + emoji.length + 1;
+  }, 20);
+}
 
 // Set texta (textarea) that will be edited -> Should add support for mutliple textareas
 function formattingSetup() {
