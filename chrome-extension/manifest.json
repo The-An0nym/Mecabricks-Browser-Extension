@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
 
-  "name": "Mecabricks Chrome Extension",
-  "version": "1.6.4",
+  "name": "Mecabricks Improvements",
+  "version": "1.6.5",
   "icons": {
     "16": "icons/16x16.png",
     "48": "icons/48x48.png",
@@ -14,7 +14,7 @@
       "16": "icons/16x16.png"
     },
     "default_popup": "menu/index.html",
-    "default_title": "Mecabricks Extension"
+    "default_title": "Mecabricks Improvements Extension"
   },
   "permissions": ["storage"],
   "content_scripts": [
