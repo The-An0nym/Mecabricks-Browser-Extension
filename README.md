@@ -5,7 +5,7 @@ A chrome extension made to improve some aspects of Mecabricks and add some featu
 ## Installation
 
 You can get the chome extension here:<br>
-https://chromewebstore.google.com/detail/mecabricks-chrome-extensi/endjoodhbfgmdfcmfkjdfakahabmgjed
+https://chromewebstore.google.com/detail/mecabricks-improvements/endjoodhbfgmdfcmfkjdfakahabmgjed
 <br><br>Or download this repository and (with developer mode turned on) install it on `chrome://extensions/`
 
 ## Features
