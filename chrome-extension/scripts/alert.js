@@ -15,6 +15,8 @@ if (document.getElementById("alert-wrapper")) {
 }
 
 async function getTimer() {
+  const enabled = await chrome.storage.sync.get("postCooldown");
+  if (!enabled.postCooldown) return;
   const data = await chrome.storage.sync.get("lastPost");
   if (!data.lastPost) return;
   const datetime = data.lastPost;
@@ -38,9 +40,9 @@ function update(datetime, ele) {
   ele.textContent = Math.round(60 - (now - datetime) / 1000);
 }
 
-getTimer();
-
 function setTimer() {
   const now = Date.parse(new Date());
   chrome.storage.sync.set({ lastPost: now });
 }
+
+getTimer();

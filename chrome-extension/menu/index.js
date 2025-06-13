@@ -4,6 +4,7 @@
 
 const hidUserToggle = document.getElementById("del_user");
 const numNotifyToggle = document.getElementById("num_notifications");
+const postCooldown = document.getElementById("post_cooldown");
 const manageUsers = document.getElementById("manage-users");
 const manageIds = document.getElementById("manage-ids");
 const usersInp = document.getElementById("user-inp");
@@ -36,6 +37,20 @@ numNotifyToggle.addEventListener("change", () => {
 
   // Save the state
   chrome.storage.sync.set({ numberedNotifications: isEnabled });
+});
+
+/* SHOW COOLDOWN */
+// Load saved state
+chrome.storage.sync.get("postCooldown", (data) => {
+  postCooldown.checked = data.postCooldown || false;
+});
+
+// Listen for changes to the checkbox
+postCooldown.addEventListener("change", () => {
+  const isEnabled = postCooldown.checked;
+
+  // Save the state
+  chrome.storage.sync.set({ postCooldown: isEnabled });
 });
 
 // EVENT LISTENERS

@@ -52,6 +52,13 @@ if (document.title !== "503 Service Unavailable") {
         validUsername(document.getElementsByClassName("username"));
         threadSubButton();
         formattingSetup();
+        // alert.js
+        document
+          .querySelector("#reply-wrapper > .button")
+          .addEventListener("mouseup", () => {
+            setTimer();
+            getTimer();
+          });
       }
       break;
     case "models": // PUBLIC LIBRARY MODEL

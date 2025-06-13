@@ -366,8 +366,9 @@ async function removeId(id, name) {
 function validUsername(eles) {
   if (!eles.length) return;
   for (const ele of eles) {
-    const username = ele.textContent;
+    const username = ele.innerText;
     if (/^[A-z0-9_.-]+$/g.test(username)) continue;
-    ele.style.color = "#d00";
+    if (ele.querySelector("a")) ele.querySelector("a").style.color = "#f64";
+    else ele.style.color = "#f64";
   }
 }
