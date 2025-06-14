@@ -40,8 +40,14 @@ function update(datetime, ele) {
   ele.textContent = Math.round(60 - (now - datetime) / 1000);
 }
 
-function setTimer() {
+async function setTimer() {
+  const data = await chrome.storage.sync.get("lastPost");
   const now = Date.parse(new Date());
+  if (data.lastPost) {
+    const datetime = Date.parse(data.lastPost);
+    if (now - datetime < 1000 * 60) return;
+  }
+
   chrome.storage.sync.set({ lastPost: now });
 }
 
