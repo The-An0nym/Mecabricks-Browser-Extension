@@ -127,6 +127,7 @@ if (document.title !== "503 Service Unavailable") {
     if (pathname[0] === "models") removeComments(data.hiddenUsers);
     else if (pathname[1] === "topic") removePosts(data.hiddenUsers);
     else if (pathname[0] === "library") removeModels(data.hiddenUsers);
+    else if (pathname[0] === "") removeModels(data.hiddenUsers);
     else if (pathname[1] === "category") removeThread(data.hiddenUsers);
     else {
       const config = { childList: true };
