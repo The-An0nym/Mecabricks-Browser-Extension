@@ -229,6 +229,7 @@ function privateLibrarySetup() {
 
 function commentCharLimit() {
   const ta = document.getElementById("comments-new-input");
+  if (!ta) return;
   // Character Limit
   const div = document.createElement("div");
   div.textContent = ta.value.length + "/500";
