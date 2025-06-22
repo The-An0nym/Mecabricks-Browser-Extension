@@ -201,7 +201,7 @@ a > .notifications {
 .post-timer {
   position: fixed;
   margin-top: 50px;
-  background-color: black;
+  background-color: #14171b;
   font-size: 1.2em;
   padding: 4px;
   min-width: 30px;

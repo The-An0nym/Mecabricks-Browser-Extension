@@ -106,13 +106,23 @@ function normalizeList(notifications) {
 
 function clearNotifications() {
   fetch("/en/account/notifications");
+  const newURL = `https://www.mecabricks.com/${lang}/account/library`;
   if (pathname.includes("workshop")) {
-    document.querySelector("a > .notifications").remove();
+    const ele = document.querySelector("a > .notifications");
+    if (ele) {
+      ele.parentElement.href = newURL;
+      ele.remove();
+    }
   } else if (pathname.includes("partmanager")) {
-    document.querySelector(".user > .notifications").remove();
+    if (document.querySelector(".user > .notifications")) {
+      document.querySelector(".user > .notifications").remove();
+      document.querySelector(".user > .picture").href = newURL;
+    }
   } else {
-    if (document.querySelector("#header-notifications"))
+    if (document.querySelector("#header-notifications")) {
       document.querySelector("#header-notifications").remove();
+      document.querySelector("#header-username").href = newURL;
+    }
   }
 }
 

@@ -3,6 +3,10 @@ const pathname =
     ? window.location.pathname.split("/").slice(2)
     : window.location.pathname.split("/").slice(1);
 const fullUrl = window.location.href;
+const lang =
+  window.location.pathname[3] === "/"
+    ? window.location.pathname.slice(1, 3)
+    : "en";
 
 // Wrapper
 if (document.title !== "503 Service Unavailable") {
