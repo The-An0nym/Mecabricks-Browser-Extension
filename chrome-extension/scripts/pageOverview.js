@@ -56,6 +56,7 @@ if (document.title !== "503 Service Unavailable") {
         validUsername(document.getElementsByClassName("username"));
         threadSubButton();
         formattingSetup();
+        forumCharLimit();
         // alert.js
         document
           .querySelector("#reply-wrapper > .button")

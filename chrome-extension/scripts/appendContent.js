@@ -152,8 +152,8 @@ const emojis = (popUp) => {
 };
 
 function emojiTab(e) {
-  if (e.code !== "Enter") return;
-  const [start, end] = getEmojiStartEnd(e.target);
+  if (e.code !== "Tab") return;
+  const [start, end] = getEmojiStartEnd(e.target, (delLastTab = true));
   if (start === end) return;
   if (end - start < 2) return;
 
@@ -164,9 +164,12 @@ function emojiTab(e) {
   insertEmoji(e.target, start, end, emoji);
 }
 
-function getEmojiStartEnd(ele) {
+function getEmojiStartEnd(ele, delLastTab = false) {
   const end = ele.selectionStart;
-  const text = ele.value;
+  let text = ele.value;
+  if (/\t/.test(text[text.length - 1])) {
+    text = text.slice(0, text.length - 2);
+  }
   let start = end;
   console.log([text]);
   for (let i = 1; i < 30; i++) {
@@ -249,6 +252,28 @@ function setupAccLibraryListener() {
   const targetNode = document.getElementById("gallery-content");
   const observer = new MutationObserver(privateLibrarySetup);
   observer.observe(targetNode, config);
+}
+
+function forumCharLimit() {
+  const tas = document.getElementsByTagName("textarea");
+  for (let i = 0; i < tas.length; i++) {
+    const ta = tas[i];
+
+    if (i !== tas.length - 1 && !ta.parentNode.querySelector(".edit")) continue;
+
+    const span = document.createElement("span");
+    if (i === tas.length - 1) span.className = "forum-character-limit-reply";
+    else span.className = "forum-character-limit";
+    span.textContent = ta.value.length + "/1000";
+
+    ta.addEventListener("keyup", () => {
+      span.textContent = ta.value.length + "/1000";
+      if (ta.value.length > 1000) span.style.color = "#ed1c24";
+      else span.style.color = "#676e75";
+    });
+
+    ta.after(span);
+  }
 }
 
 /* BLOCK MECHANISM */

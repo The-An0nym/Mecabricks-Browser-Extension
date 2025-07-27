@@ -197,6 +197,20 @@ a > .notifications {
   border-top: none;
 }
 
+.forum-character-limit {
+  color: #676e75;
+  position: absolute;
+  bottom: 20px;
+  right: 505px;
+}
+
+.forum-character-limit-reply {
+  color: #676e75;
+  position: absolute;
+  margin-top: 15px;
+  margin-left: 545px;
+}
+
 /* TIMER */
 .post-timer {
   position: fixed;
@@ -209,4 +223,10 @@ a > .notifications {
   z-index: 50;
   border-radius: 0 0 10px 0;
   color: white;
+}
+
+/* OTHER */
+
+textarea {
+  resize: vertical;
 }
