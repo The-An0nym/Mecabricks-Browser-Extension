@@ -49,6 +49,7 @@ https://chromewebstore.google.com/detail/mecabricks-improvements/endjoodhbfgmdfc
 - Allows users to select the part reference in the Workshop when selecting a part
 - Allows importing and displaying of reference image (displayed in the workshop background) (Supported: .png, .jpg, .webp, .gif)
 - Hoists folders on the import screen for Mecabricks models to the top
+- Part library icons can be scaled up to 2x size with the 2x button on the part library bar for better visibility.
   <br><br>
 
 ---

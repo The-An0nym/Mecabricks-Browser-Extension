@@ -230,3 +230,73 @@ a > .notifications {
 textarea {
   resize: vertical;
 }
+
+/* WORKSHOP PART MANAGER */
+
+#part-library-magnifier {
+  float: right;
+  width: 20px;
+  height: 0px;
+  text-align: center;
+  margin-right: 5px;
+}
+
+#part-library-magnifier > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+:root {
+  --width-it: 78px;
+  --height-it: 75px;
+
+  --width-ic: 72px;
+  --height-ic: 57px;
+
+  --width-ne: 30px;
+  --height-ne: 30px;
+  --margin-ne: 21px 24px;
+
+  --font-size: 10px;
+}
+
+body.magnify {
+  --width-it: 156px;
+  --height-it: 153px;
+
+  --width-ic: 144px;
+  --height-ic: 114px;
+
+  --width-ne: 60px;
+  --height-ne: 60px;
+  --margin-ne: 42px 48px;
+
+  --font-size: 16px;
+}
+
+.viewport > .items > .item {
+  width: var(--width-it) !important;
+  height: var(--height-it) !important;
+}
+
+.item > .icon.part,
+.item > .icon.folder {
+  width: var(--width-ic) !important;
+  height: var(--height-ic) !important;
+}
+
+.item > .next {
+  width: var(--width-ne) !important;
+  height: var(--height-ne) !important;
+  margin: var(--margin-ne) !important;
+}
+
+.item > .reference {
+  font-size: var(--font-size) !important;
+  height: calc(var(--font-size) + 4px) !important;
+}
+
+.ui-select-wrapper.ui-position-single.categories > select {
+  font-size: calc(var(--font-size) + 1px) !important;
+}

@@ -37,6 +37,13 @@ if (document.title !== "503 Service Unavailable") {
         }
       });
       x.observe(document.body, { childList: true });
+      const y = new MutationObserver(() => {
+        if (document.querySelector("#part-library > .header > .tooltip")) {
+          magnifierSetup(); // workshopFolders.js
+          y.disconnect();
+        }
+      });
+      y.observe(document.body, { childList: true });
       break;
     case "partmanager": // PART MANAGER
       // notifications.js

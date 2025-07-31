@@ -35,3 +35,26 @@ function impClicked() {
     observer.observe(targetNode, config);
   }
 }
+
+function resizePartLibrary() {
+  const state = document.body.classList.toggle("magnify");
+  const ele = document.querySelector("#part-library-magnifier > div");
+  if (state) ele.textContent = "1x";
+  else ele.textContent = "2x";
+}
+
+function magnifierSetup() {
+  const ele = document.querySelector("#part-library > .header > .tooltip");
+
+  const div = document.createElement("div");
+  div.id = "part-library-magnifier";
+
+  const innerDiv = document.createElement("div");
+  innerDiv.className = "ui-button-wrapper";
+
+  innerDiv.textContent = "2x";
+  innerDiv.addEventListener("mousedown", resizePartLibrary);
+
+  div.appendChild(innerDiv);
+  ele.parentNode.insertBefore(div, ele);
+}
