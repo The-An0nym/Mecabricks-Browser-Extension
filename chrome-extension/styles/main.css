@@ -275,24 +275,24 @@ body.magnify {
   --font-size: 16px;
 }
 
-.viewport > .items > .item {
+#part-library > .content > .viewport > .items > .item {
   width: var(--width-it) !important;
   height: var(--height-it) !important;
 }
 
-.item > .icon.part,
-.item > .icon.folder {
+#part-library > .content > .viewport > .items > .item > .icon.part,
+#part-library > .content > .viewport > .items > .item > .icon.folder {
   width: var(--width-ic) !important;
   height: var(--height-ic) !important;
 }
 
-.item > .next {
+#part-library > .content > .viewport > .items > .item > .next {
   width: var(--width-ne) !important;
   height: var(--height-ne) !important;
   margin: var(--margin-ne) !important;
 }
 
-.item > .reference {
+#part-library > .content > .viewport > .items > .item > .reference {
   font-size: var(--font-size) !important;
   height: calc(var(--font-size) + 4px) !important;
 }
