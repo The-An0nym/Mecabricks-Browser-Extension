@@ -276,6 +276,29 @@ function forumCharLimit() {
   }
 }
 
+function AppendPublicProfile() {
+  const bar = document.getElementById("subHeader-wrapper");
+  const anchor = document.createElement("a");
+
+  let username;
+
+  if (pathname[1] != "notifications")
+    username = document
+      .getElementById("header-username")
+      .childNodes[0].nodeValue.trim();
+  else
+    username = document
+      .querySelector("#user-card > .data > .username")
+      .textContent.trim();
+
+  anchor.href = `https://www.mecabricks.com/${lang}/user/${username}`;
+  anchor.className = "button";
+  anchor.id = "subHeader-profile";
+  anchor.textContent = "Profile";
+
+  bar.appendChild(anchor);
+}
+
 /* BLOCK MECHANISM */
 
 async function threadSubButton() {

@@ -231,6 +231,30 @@ textarea {
   resize: vertical;
 }
 
+#subHeader-profile::before {
+  /*
+  <svg width="200px" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#7A94AF" stroke-width="16px">
+  <circle r="40" cx="100" cy="50"></circle>
+  <circle cx="100" cy="190" r="80" stroke-dasharray="180" stroke-dashoffset="180" pathLength="360"></circle>
+  <line x1="20" y1="182" x2="180" y2="182"></line>
+  </svg> 
+  */
+  background-image: url("data:image/svg+xml, %3Csvg%20width=%22200px%22%20viewBox=%220%200%20200%20200%22%20xmlns=%22http://www.w3.org/2000/svg%22%20fill=%22none%22%20stroke=%22%237A94AF%22%20stroke-width=%2216px%22%3E%3Ccircle%20r=%2240%22%20cx=%22100%22%20cy=%2250%22%3E%3C/circle%3E%3Ccircle%20cx=%22100%22%20cy=%22190%22%20r=%2280%22%20stroke-dasharray=%22180%22%20stroke-dashoffset=%22180%22%20pathLength=%22360%22%3E%3C/circle%3E%3Cline%20x1=%2220%22%20y1=%22182%22%20x2=%22180%22%20y2=%22182%22%3E%3C/line%3E%3C/svg%3E");
+  background-position: 0px 0px;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  content: "";
+  display: block;
+  float: left;
+  height: 16px;
+  margin: 9px 10px;
+  width: 20px;
+}
+
+#subHeader-profile:hover::before {
+  background-image: url("data:image/svg+xml, %3Csvg%20width=%22200px%22%20viewBox=%220%200%20200%20200%22%20xmlns=%22http://www.w3.org/2000/svg%22%20fill=%22none%22%20stroke=%22%233E526C%22%20stroke-width=%2216px%22%3E%3Ccircle%20r=%2240%22%20cx=%22100%22%20cy=%2250%22%3E%3C/circle%3E%3Ccircle%20cx=%22100%22%20cy=%22190%22%20r=%2280%22%20stroke-dasharray=%22180%22%20stroke-dashoffset=%22180%22%20pathLength=%22360%22%3E%3C/circle%3E%3Cline%20x1=%2220%22%20y1=%22182%22%20x2=%22180%22%20y2=%22182%22%3E%3C/line%3E%3C/svg%3E");
+}
+
 /* WORKSHOP PART MANAGER */
 
 #part-library-magnifier {

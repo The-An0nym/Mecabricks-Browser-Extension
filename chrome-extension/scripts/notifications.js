@@ -1,5 +1,4 @@
-// TODO:
-// Blacklist necessary?
+// TODO: Blacklist necessary?
 async function getNotifications(date) {
   const dateTime = encodeURIComponent(date);
   try {
@@ -144,7 +143,10 @@ async function checkNotifications() {
   const sHidIds = await chrome.storage.sync.get("hidden_id_name");
   const sHideDeletedUsers = await chrome.storage.sync.get("hideDeletedUsers");
   const hidUsers = sHiddenUsers.hiddenUsers;
-  const hidIds = sHidIds.hidden_id_name.ids;
+  let hidIds = undefined;
+
+  if (sHidIds.hidden_id_name) hidIds = sHidIds.hidden_id_name.ids;
+
   const hideDelUsers = sHideDeletedUsers.hideDeletedUsers;
 
   if (!hidUsers && !hidIds && !hideDelUsers) return;

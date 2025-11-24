@@ -40,6 +40,7 @@ https://chromewebstore.google.com/detail/mecabricks-improvements/endjoodhbfgmdfc
 - Increases the model description textarea (input) size and allows it to be vertically increased
 - Character limits indicator for comments, model descriptions and forum posts
 - Shows a timer whenever posting a comment, counting down from 60 seconds to indicate when you can comment again
+- Profile button on /account/ that directly links to your public profile (assuming you have a valid username)
   <br><br>
 
 ---

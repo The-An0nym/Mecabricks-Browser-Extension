@@ -13,8 +13,9 @@ if (document.title !== "503 Service Unavailable") {
   switch (pathname[0]) {
     case "account": // ACCOUNT
       // appendContent.js
+      AppendPublicProfile();
       if (pathname[1] === "library") setupAccLibraryListener();
-      if (pathname[1] === "messages") {
+      else if (pathname[1] === "messages") {
         formattingSetup();
         const x = new MutationObserver(() => {
           validUsername(target.getElementsByClassName("username"));

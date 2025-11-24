@@ -2,7 +2,7 @@
   "manifest_version": 3,
 
   "name": "Mecabricks Improvements",
-  "version": "1.6.7.1",
+  "version": "1.6.7.2",
   "icons": {
     "16": "icons/16x16.png",
     "48": "icons/48x48.png",
