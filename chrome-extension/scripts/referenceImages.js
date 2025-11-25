@@ -1,4 +1,7 @@
-const imgsList = []; // This will hold a list of JSON (meta)data for our images
+/**
+ * List of Json objects of (meta)data of images
+ */
+const imgsList = [];
 
 /* IMAGE FUNCTIONS */
 function loadImage(e) {
@@ -131,7 +134,9 @@ function removeImage(e) {
   updateImages();
 }
 
-/* APPEND IMAGES MENU BUTTON */
+/**
+ * Set up for image menu button in workshop
+ */
 function appendImageMenu() {
   menuOption = createMenuOption();
   menuPanel = createMenuPanel();

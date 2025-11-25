@@ -1,3 +1,7 @@
+/**
+ * Reorders the workshop model import screen such that
+ * the folders appear first
+ */
 function reOrderFolders() {
   const wrapper = document.getElementsByClassName("nano-content")[0];
   if (!wrapper) return;
@@ -21,12 +25,19 @@ function reOrderFolders() {
   eles2[0].done = true;
 }
 
+/**
+ * Adds eventListener to import button in workshop to call `impClicked()`
+ */
 function menuImpClicked() {
   document
     .getElementById("import-button")
     .addEventListener("mouseup", () => setTimeout(impClicked, 100));
 }
 
+/**
+ * Checks continuously whether the import screen has updated,
+ * and if yes, calls `reOrderFolders()`
+ */
 function impClicked() {
   if (document.getElementsByClassName("nano-content").length) {
     const config = { childList: true };
@@ -36,6 +47,9 @@ function impClicked() {
   }
 }
 
+/**
+ * Toggles magnifier button text
+ */
 function resizePartLibrary() {
   const state = document.body.classList.toggle("magnify");
   const ele = document.querySelector("#part-library-magnifier > div");
@@ -43,6 +57,9 @@ function resizePartLibrary() {
   else ele.textContent = "2x";
 }
 
+/**
+ * Toggles the workshop part library magnification level between 1x and 2x zoom
+ */
 function magnifierSetup() {
   const ele = document.querySelector("#part-library > .header > .tooltip");
 

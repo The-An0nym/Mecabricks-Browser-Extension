@@ -1,4 +1,4 @@
-// To do:
+// TODO
 // Clean up, maybe re-use functions?
 // Fix css (use classes over IDs)
 

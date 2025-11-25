@@ -1,3 +1,7 @@
+/**
+ * Removes comments by hidden users
+ * @param {String[]} users list of hidden users
+ */
 function removeComments(users) {
   const usernames = document.getElementsByClassName("author");
   for (let i = usernames.length - 1; i >= 0; i--) {
@@ -8,6 +12,10 @@ function removeComments(users) {
   }
 }
 
+/**
+ * Removes posts by hidden users
+ * @param {String[]} users list of hidden users
+ */
 function removePosts(users) {
   const usernames = document.getElementsByClassName("username");
   for (let i = usernames.length - 1; i >= 0; i--) {
@@ -18,6 +26,10 @@ function removePosts(users) {
   }
 }
 
+/**
+ * Removes models by hidden users
+ * @param {String[]} users list of hidden users
+ */
 function removeModels(users) {
   const usernames = document.getElementsByClassName("username");
   for (let i = usernames.length - 1; i >= 0; i--) {
@@ -28,6 +40,10 @@ function removeModels(users) {
   }
 }
 
+/**
+ * Removes discussions created by hidden users
+ * @param {String[]} users list of hidden users
+ */
 function removeThread(users) {
   const usernames = document.getElementsByClassName("info");
   for (let i = usernames.length - 1; i >= 0; i--) {
@@ -42,7 +58,12 @@ function removeThread(users) {
   }
 }
 
-/* Mutation obs triggered functions */
+/* --- Mutation obs triggered functions --- */
+
+/**
+ * Removes conversation indicator of hidden users (on /account/messages)
+ * @param {String[]} users list of hidden users
+ */
 function removeMessages(users) {
   const items = document.getElementsByClassName("item");
   if (items.length === 0) return;
@@ -60,6 +81,10 @@ function removeMessages(users) {
   }
 }
 
+/**
+ * Removes notifications that have to do with hidden users
+ * @param {String[]} users list of hidden users
+ */
 function removeNotifications(users) {
   const items = document.getElementsByClassName("notification");
   if (items.length === 0) return;
@@ -98,6 +123,7 @@ function removeNotifications(users) {
       )
     ) {
       items[i].remove();
+
       // MODELS
     } else if (
       items[i].getElementsByClassName("image-container").length === 1 &&
@@ -113,6 +139,10 @@ function removeNotifications(users) {
   }
 }
 
+/**
+ * Removes hidden models or forum discussion from the notifications tab
+ * @param {String[]} ids list of hidden models or forum discussions
+ */
 function removeById(ids) {
   const items = document.getElementsByClassName("notification");
   if (items.length === 0) return;

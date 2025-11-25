@@ -1,3 +1,7 @@
+/**
+ * GLOBAL CONSTANTS
+ * @var pathname is a list of all folders or file names after *BASEURL/LANG/*
+ */
 const pathname =
   window.location.pathname[3] === "/"
     ? window.location.pathname.split("/").slice(2)
@@ -8,11 +12,18 @@ const lang =
     ? window.location.pathname.slice(1, 3)
     : "en";
 
-// Wrapper
-if (document.title !== "503 Service Unavailable") {
+/**
+ * Determines which functions need to be executing
+ * based on what page the user currently is.
+ */
+const main = function () {
+  // Guard clause in case the website is down
+  if (document.title == "503 Service Unavailable") return;
+
   switch (pathname[0]) {
-    case "account": // ACCOUNT
-      // appendContent.js
+    // Personal account
+    case "account":
+      // Functions can be found in appendContent.js
       AppendPublicProfile();
       if (pathname[1] === "library") setupAccLibraryListener();
       else if (pathname[1] === "messages") {
@@ -25,11 +36,15 @@ if (document.title !== "503 Service Unavailable") {
         x.observe(target, { childList: true });
       }
       break;
-    case "workshop": // WORKSHOP
+
+    // Workshop
+    case "workshop":
       appendImageMenu(); // referenceImages.js
+
       // workshopFolders.js
       const ele = document.getElementById("menu-import");
       ele.addEventListener("mouseup", () => setTimeout(menuImpClicked, 100));
+
       // notifications.js
       const x = new MutationObserver(() => {
         if (document.querySelector("a > .notifications")) {
@@ -37,6 +52,7 @@ if (document.title !== "503 Service Unavailable") {
           x.disconnect();
         }
       });
+
       x.observe(document.body, { childList: true });
       const y = new MutationObserver(() => {
         if (document.querySelector("#part-library > .header > .tooltip")) {
@@ -46,25 +62,35 @@ if (document.title !== "503 Service Unavailable") {
       });
       y.observe(document.body, { childList: true });
       break;
-    case "partmanager": // PART MANAGER
+
+    // Partmanager
+    case "partmanager":
       // notifications.js
       if (document.querySelector(".user > .notifications"))
         checkNotifications();
       break;
-    case "library": // PUBLIC LIBRARY
+
+    // Public library
+    case "library":
       validUsername(document.getElementsByClassName("username"));
       if (fullUrl.includes("%22")) fixQuotesSearch();
       break;
-    case "forum": // FORUM
+
+    // Any forum page
+    case "forum":
+      // On forum/category
       if (pathname[1] === "category") {
         // CATEGORY
         formattingSetup();
+
+        // On forum/topic
       } else if (pathname[1] === "topic") {
         // DISCUSSION
         validUsername(document.getElementsByClassName("username"));
         threadSubButton();
         formattingSetup();
         forumCharLimit();
+
         // alert.js
         document
           .querySelector("#reply-wrapper > .button")
@@ -74,7 +100,9 @@ if (document.title !== "503 Service Unavailable") {
           });
       }
       break;
-    case "models": // PUBLIC LIBRARY MODEL
+
+    // Model page
+    case "models":
       modelSubButton();
       validUsername(document.getElementsByClassName("author"));
       commentCharLimit();
@@ -87,24 +115,26 @@ if (document.title !== "503 Service Unavailable") {
           getTimer();
         });
       break;
-    case "user": // USER
+
+    // Public user profile
+    case "user":
       if (pathname[2] === "comments") {
         // USER COMMENT HISTORY
         fixEmojisComments(); // fix.js
       }
       break;
-    case "emojis": // EMOJIS
+
+    // Special /emojis/ page
+    case "emojis":
       // fix.js
       fixEmojisPage();
       break;
   }
 
-  // NOTIFICATIONS
-  if (pathname[1] === "notifications") {
-    storeLatestNotifications();
-  } else {
-    if (document.querySelector("#header-notifications")) checkNotifications();
-  }
+  // For notification storage/checking regarding hidden threads/users
+  if (pathname[1] === "notifications") storeLatestNotifications();
+  else if (document.querySelector("#header-notifications"))
+    checkNotifications();
 
   // Hide deleted users
   chrome.storage.sync.get("hideDeletedUsers", (data) => {
@@ -174,4 +204,9 @@ if (document.title !== "503 Service Unavailable") {
       observer.observe(targetNode, config);
     }
   });
-}
+};
+
+/**
+ * Starting point of everything
+ */
+main();

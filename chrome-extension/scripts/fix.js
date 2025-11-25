@@ -1,4 +1,6 @@
-// Fixing emojis
+/**
+ * Fixes emojis on user comment history page
+ */
 function fixEmojisComments() {
   const x = document.getElementsByClassName("emoji"); // Get Emoji elements
   for (let i = 0; i < x.length; i++) {
@@ -8,6 +10,9 @@ function fixEmojisComments() {
   }
 }
 
+/**
+ * Fixes emojis on special /emojis/ page
+ */
 function fixEmojisPage() {
   const x = document.getElementsByClassName("image"); // Get Emoji elements
   for (let i = 0; i < x.length; i++) {
@@ -20,7 +25,9 @@ function fixEmojisPage() {
   }
 }
 
-// Fixing search with quotation marks
+/**
+ * Fixes subsequent pages of library searches that contain quotation marks
+ */
 function fixQuotesSearch() {
   const prev = document.getElementsByClassName("button sprite-gallery prev")[0];
   const next = document.getElementsByClassName("button sprite-gallery next")[0];

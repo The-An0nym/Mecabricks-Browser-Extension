@@ -1,3 +1,7 @@
+/**
+ * Global constant containing key value pairs of the form:
+ * {index: ["emojiName", "emojiId"],}
+ */
 const emojiList = {
   0: ["sunny", "2600"],
   1: ["cloud", "2601"],

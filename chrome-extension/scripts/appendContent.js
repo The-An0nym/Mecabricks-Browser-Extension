@@ -1,8 +1,12 @@
-function setUpBBCodeFormatter(textAs) {
+/**
+ * Gives each textArea of an array BBCode formatting tools and an emoji pop-up bar
+ * @param {Element} textAreaArray
+ */
+function setUpBBCodeFormatter(textAreaArray) {
   //prettier-ignore
   const fTypes = ["i", "b", "u", "s", "center", "code", "img", "url", "color", "size", "youtube", "mecabricks"];
 
-  for (const texta of textAs) {
+  for (const texta of textAreaArray) {
     // Create container with 0px height
     const container = document.createElement("div");
     container.className = "text-editing-container";
@@ -46,28 +50,33 @@ function setUpBBCodeFormatter(textAs) {
   }
 }
 
-// Check if text has been selected in textarea
+/**
+ * Check if text has been selected in textarea
+ * @param {Element} container the BBCode pop-up which needs to be shown
+ * @param {Event} e event
+ * @param {boolean} removeWhiteSpace if true will trim the selection to remove white space
+ */
 function checkSelection(container, e, removeWhiteSpace) {
   const texta = e.target;
   const textSelection = window.getSelection().toString();
   const formatter = container.getElementsByClassName("formatting-pop-up")[0];
-  if (textSelection === "") {
+
+  if (textSelection === "" || textSelection.trim() === "") {
     formatter.style.display = "none";
     return;
   }
 
-  if (textSelection.trim() === "") return;
-
-  if (removeWhiteSpace) {
-    if (textSelection.trim().length !== textSelection.length) {
-      const index = textSelection.indexOf(textSelection.trim());
-      texta.selectionStart += index;
-      texta.selectionEnd -=
-        textSelection.length - (index + textSelection.trim().length);
-      // Remove end whitespace
-      if (texta.selectionEnd === texta.selectionStart) return; // In case a single space was selected
-    }
+  if (
+    removeWhiteSpace &&
+    textSelection.trim().length !== textSelection.length
+  ) {
+    // Adjust selection
+    const index = textSelection.indexOf(textSelection.trim());
+    texta.selectionStart += index;
+    texta.selectionEnd -=
+      textSelection.length - (index + textSelection.trim().length);
   }
+
   formatter.style.display = "block";
   container.style.position = "";
   container.style.top = "";
@@ -78,37 +87,46 @@ function checkSelection(container, e, removeWhiteSpace) {
   }
 }
 
-// Add BBCode to user input
-function formatSelection(str, texta) {
+/**
+ * Adding the BBCode tags to a textArea around selected text
+ * @param {String} str
+ * @param {Element} texta textarea
+ */
+function formatSelection(tag, texta) {
   const tv = texta.value;
   const start = texta.selectionStart;
   const end = texta.selectionEnd;
 
-  const editable = ["url", "size", "color"].includes(str); // Bool for editables
-  const http = str === "url" && tv.slice(start, end).includes("http"); // Bool if URL
+  const editable = ["url", "size", "color"].includes(tag); // Bool for editables
+  const http = tag === "url" && tv.slice(start, end).includes("http"); // Bool if URL
 
-  let str0 = editable ? "[" + str + "=" : "[" + str;
-  let str1 = http ? "][/" + str + "]" : "[/" + str + "]";
+  let startTag = editable ? "[" + tag + "=" : "[" + tag;
+  let endTag = http ? "][/" + tag + "]" : "[/" + tag + "]";
 
-  if (str === "size") {
-    str0 += "px]"; // [size=px]{content}
+  if (tag === "size") {
+    startTag += "px]"; // [size=px]{content}
   } else if (!http) {
-    str0 += "]"; // [url=]{content} or [color=]{content}
+    startTag += "]"; // [url=]{content} or [color=]{content}
   }
 
   texta.value =
-    tv.slice(0, start) + str0 + tv.slice(start, end) + str1 + tv.slice(end);
+    tv.slice(0, start) +
+    startTag +
+    tv.slice(start, end) +
+    endTag +
+    tv.slice(end);
 
+  // Small delay needed to work properly
   setTimeout(() => {
     texta.select();
     // Mouse cursor or selection
     if (editable && http) {
-      texta.selectionStart = texta.selectionEnd = end + str0.length + 1;
+      texta.selectionStart = texta.selectionEnd = end + startTag.length + 1;
     } else if (editable) {
-      texta.selectionStart = texta.selectionEnd = start + 2 + str.length;
+      texta.selectionStart = texta.selectionEnd = start + 2 + tag.length;
     } else {
-      texta.selectionStart = start + 2 + str.length;
-      texta.selectionEnd = end + 2 + str.length;
+      texta.selectionStart = start + 2 + tag.length;
+      texta.selectionEnd = end + 2 + tag.length;
       const e = {};
       e.target = texta;
       checkSelection(texta.previousSibling, e, true);
@@ -116,6 +134,11 @@ function formatSelection(str, texta) {
   }, 20);
 }
 
+/**
+ * Function generator handling emoji events and emoji pop-up
+ * @param {Element} popUp emojis pop-up quick select
+ * @returns {function} function
+ */
 const emojis = (popUp) => {
   return function (e) {
     e.target.removeEventListener("keydown", emojiTab);
@@ -151,9 +174,13 @@ const emojis = (popUp) => {
   };
 };
 
+/**
+ * Eventlistener function that will insert selected emoji when tab ist pressed
+ * @param {Event} e event
+ */
 function emojiTab(e) {
   if (e.code !== "Tab") return;
-  const [start, end] = getEmojiStartEnd(e.target, (delLastTab = true));
+  const [start, end] = getEmojiStartEnd(e.target, true);
   if (start === end) return;
   if (end - start < 2) return;
 
@@ -164,9 +191,17 @@ function emojiTab(e) {
   insertEmoji(e.target, start, end, emoji);
 }
 
-function getEmojiStartEnd(ele, delLastTab = false) {
-  const end = ele.selectionStart;
-  let text = ele.value;
+/**
+ * Determines where the user is trying to insert an emoji
+ * @param {Element} textArea the text area element ?
+ * @param {boolean} delLastTab deletes last tab (in case one is appended)
+ * @returns {Array} [start, end] index of textArea text
+ */
+
+function getEmojiStartEnd(textArea, delLastTab = false) {
+  // TODO test whether delLastTab is still necessary
+  const end = textArea.selectionStart; // Current position of user cursor
+  let text = textArea.value;
   if (/\t/.test(text[text.length - 1])) {
     text = text.slice(0, text.length - 2);
   }
@@ -182,17 +217,28 @@ function getEmojiStartEnd(ele, delLastTab = false) {
   return [start, end];
 }
 
+/**
+ * Changes the text area to insert the emoji at the desired place
+ * @param {Element} tar target
+ * @param {index} start start index of emoji
+ * @param {index} end end index of emoji
+ * @param {String} emoji Emoji to be inserted
+ */
 function insertEmoji(tar, start, end, emoji) {
   const text = tar.value;
   const newText = text.slice(0, start) + emoji + ":" + text.slice(end);
   tar.value = newText;
+
+  // Delay necessary
   setTimeout(() => {
     tar.select();
     tar.selectionEnd = tar.selectionStart = end + emoji.length + 1;
   }, 20);
 }
 
-// Set texta (textarea) that will be edited -> Should add support for mutliple textareas
+/**
+ * Start of text formatting set up (for BBCode and emoji panels) for all text areas
+ */
 function formattingSetup() {
   const elements = document.getElementsByTagName("textarea");
   if (elements.length !== 0) {
@@ -200,7 +246,9 @@ function formattingSetup() {
   }
 }
 
-// For model editor
+/**
+ * Changes the private library model editor (e.g. BBCode and Emoji panel to description)
+ */
 function privateLibrarySetup() {
   const ta = document.getElementById("properties-description");
   if (!ta) return;
@@ -227,12 +275,28 @@ function privateLibrarySetup() {
     else div.style.color = "#fff";
   });
 
+  // BBCode and emojis
   setUpBBCodeFormatter([ta]);
 }
 
+/**
+ * Adds an observer to the private library to detect the opening of the model editor
+ * and applies the wanted changes (e.g. BBCode and emoji formatting for description)
+ */
+function setupAccLibraryListener() {
+  const config = { childList: true };
+  const targetNode = document.getElementById("gallery-content");
+  const observer = new MutationObserver(privateLibrarySetup);
+  observer.observe(targetNode, config);
+}
+
+/**
+ * Adds character limit indicator to comments
+ */
 function commentCharLimit() {
   const ta = document.getElementById("comments-new-input");
   if (!ta) return;
+
   // Character Limit
   const div = document.createElement("div");
   div.textContent = ta.value.length + "/500";
@@ -247,13 +311,9 @@ function commentCharLimit() {
   });
 }
 
-function setupAccLibraryListener() {
-  const config = { childList: true };
-  const targetNode = document.getElementById("gallery-content");
-  const observer = new MutationObserver(privateLibrarySetup);
-  observer.observe(targetNode, config);
-}
-
+/**
+ * Adds character limit indicator to forum posts
+ */
 function forumCharLimit() {
   const tas = document.getElementsByTagName("textarea");
   for (let i = 0; i < tas.length; i++) {
@@ -276,6 +336,9 @@ function forumCharLimit() {
   }
 }
 
+/**
+ * Appens public profile button the the menu bar on /account/ page
+ */
 function AppendPublicProfile() {
   const bar = document.getElementById("subHeader-wrapper");
   const anchor = document.createElement("a");
@@ -299,8 +362,28 @@ function AppendPublicProfile() {
   bar.appendChild(anchor);
 }
 
-/* BLOCK MECHANISM */
+/**
+ * Marks invalid usernames red
+ * @param {Element[]} elements all the elements that contain usernames to be checked
+ */
+function validUsername(elements) {
+  if (!elements.length) return;
 
+  for (const ele of elements) {
+    const username = ele.innerText;
+    if (/^[A-z0-9_.-]+$/g.test(username)) continue; // Valid username
+
+    if (ele.querySelector("a")) ele.querySelector("a").style.color = "#f64";
+    else ele.style.color = "#f64";
+  }
+}
+
+/* BLOCK MECHANISMS/APPENDAGES */
+// TODO maybe move to separate file?
+
+/**
+ * Adds and updates un/subscrube button on forum discussions
+ */
 async function threadSubButton() {
   const navBar = document.getElementById("nav-bar");
   const button = document.createElement("button");
@@ -327,6 +410,9 @@ async function threadSubButton() {
   navBar.appendChild(button);
 }
 
+/**
+ * Adds and updates un/subscribe button for model comment sections
+ */
 async function modelSubButton() {
   const comment = document.getElementById("comments-qty");
   const button = document.createElement("button");
@@ -353,12 +439,23 @@ async function modelSubButton() {
   comment.appendChild(button);
 }
 
+/**
+ * Checks whether the user is unsubscribed, given the id
+ * @param {String} id id of forum discussion or model
+ * @returns {boolean} unsubscribed?
+ */
 async function unsubscribed(id) {
   const hidden = await chrome.storage.sync.get("hidden_id_name");
   if (hidden.hidden_id_name) return hidden.hidden_id_name.ids.includes(id);
   else return false;
 }
 
+/**
+ * Creates in entry in the unsubscribed list
+ * @param {String} id id of forum discussion or model
+ * @param {String} name title of the forum discussion or model
+ * @returns
+ */
 async function storeId(id, name) {
   if (!id || !name) return;
   const previous = await chrome.storage.sync.get("hidden_id_name");
@@ -382,6 +479,12 @@ async function storeId(id, name) {
 
   chrome.storage.sync.set(obj);
 }
+
+/**
+ * Deletes an entry in the unsubscribed list
+ * @param {String} id id of forum discussion or model
+ * @param {String} name title of forum discussion or model
+ */
 
 async function removeId(id, name) {
   if (!id || !name) return;
@@ -410,15 +513,4 @@ async function removeId(id, name) {
   obj.hidden_id_name.names = newNames;
 
   chrome.storage.sync.set(obj);
-}
-
-/* UNSUPPORTED NAMES RED */
-function validUsername(eles) {
-  if (!eles.length) return;
-  for (const ele of eles) {
-    const username = ele.innerText;
-    if (/^[A-z0-9_.-]+$/g.test(username)) continue;
-    if (ele.querySelector("a")) ele.querySelector("a").style.color = "#f64";
-    else ele.style.color = "#f64";
-  }
 }

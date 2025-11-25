@@ -1,4 +1,4 @@
-// TODO: Blacklist necessary?
+// TODO Blacklist necessary?
 async function getNotifications(date) {
   const dateTime = encodeURIComponent(date);
   try {
