@@ -1,6 +1,5 @@
 {
   "manifest_version": 3,
-
   "name": "Mecabricks Improvements",
   "version": "1.6.7.2",
   "icons": {
@@ -34,5 +33,10 @@
       "css": ["styles/main.css"],
       "matches": ["https://mecabricks.com/*", "https://www.mecabricks.com/*"]
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "the.x.an0nym@gmail.com"
+    }
+  }
 }

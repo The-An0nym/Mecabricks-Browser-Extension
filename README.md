@@ -1,12 +1,13 @@
-# Mecabricks Chrome Extension
+# Mecabricks Browser Extension
 
-A chrome extension made to improve some aspects of Mecabricks and add some features that grant a nicer user experience.
+A browser extension made to improve some aspects of Mecabricks and add some features that grant a nicer user experience.
 
 ## Installation
 
 You can get the chome extension here:<br>
 https://chromewebstore.google.com/detail/mecabricks-improvements/endjoodhbfgmdfcmfkjdfakahabmgjed
 <br><br>Or download this repository and (with developer mode turned on) install it on `chrome://extensions/`
+<br>(Support for Firefox is pending)
 
 ## Features
 
