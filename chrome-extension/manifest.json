@@ -28,7 +28,7 @@
         "scripts/referenceImages.js",
         "scripts/notifications.js",
         "scripts/workshopExtra.js",
-        "scripts/pageOverview.js"
+        "scripts/main.js"
       ],
       "css": ["styles/main.css"],
       "runAt": "document_start",

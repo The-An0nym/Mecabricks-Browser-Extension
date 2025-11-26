@@ -1,4 +1,9 @@
 /**
+ * Made by The_An0nym (online alias)
+ * Licensed under BSD 3-Clause License
+ */
+
+/**
  * GLOBAL CONSTANTS
  * @var pathname is a list of all folders or file names after *BASEURL/LANG/*
  */

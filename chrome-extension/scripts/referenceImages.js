@@ -50,6 +50,9 @@ function loadImage(e) {
   };
 }
 
+/**
+ * Updates all images displayed in workshop background
+ */
 function updateImages() {
   const bgElement = document.querySelector("div.scene > canvas");
 
@@ -81,35 +84,38 @@ function updateImages() {
   }
 }
 
-function changeSize(val) {
+// Transformation functions
+function setSize(val) {
+  transformImage(val, "size");
+}
+
+function setXPos(val) {
+  transformImage(val, "x");
+}
+
+function setYPos(val) {
+  transformImage(val, "y");
+}
+
+/**
+ * Transforms image and updates images
+ * @param {Element} val Slider element containing value
+ * @param {String} type type of transformation {size, x, y}
+ */
+function transformImage(val, type) {
   let index = val.index;
   let value = val.textContent;
   if (isNaN(index) || isNaN(value)) return;
   index = parseInt(index);
   value = parseInt(value);
-  imgsList[index].size = value;
+  imgsList[index][type] = value;
   updateImages();
 }
 
-function changeXPos(val) {
-  let index = val.index;
-  let value = val.textContent;
-  if (isNaN(index) || isNaN(value)) return;
-  index = parseInt(index);
-  value = parseInt(value);
-  imgsList[index].x = value;
-  updateImages();
-}
-
-function changeYPos(val) {
-  let index = val.index;
-  let value = val.textContent;
-  if (isNaN(index) || isNaN(value)) return;
-  index = parseInt(index);
-  value = parseInt(value);
-  imgsList[index].y = value;
-  updateImages();
-}
+/**
+ * Toggles image visibility of a given image and updates images
+ * @param {Event} e event
+ */
 
 function toggleImageVisibility(e) {
   if (e.target.index === undefined) return;
@@ -118,6 +124,10 @@ function toggleImageVisibility(e) {
   updateImages();
 }
 
+/**
+ * Removes a given image and updates images
+ * @param {Event} e event
+ */
 function removeImage(e) {
   let index;
   if (e.target.index === undefined) index = e.target.parentNode.index;
@@ -146,24 +156,35 @@ function appendImageMenu() {
   );
 }
 
-function toggleMenuEvent(e, mO, mP) {
-  if (!mP.contains(e.target) && !mO.contains(e.target)) {
-    mP.style.display = "none";
-  } else if (mO.contains(e.target)) {
+/**
+ * Checks whether menuOption or menuPanel elements were clicked.
+ * Hides if neither were clicked.
+ * Toggles if menuOption was clicked (the workshop button on the top bar)
+ * @param {Event} e event
+ * @param {Element} menuOption menu option element
+ * @param {Element} menuPanel menu panel element
+ */
+function toggleMenuEvent(e, menuOption, menuPanel) {
+  if (!menuPanel.contains(e.target) && !menuOption.contains(e.target)) {
+    menuPanel.style.display = "none";
+  } else if (menuOption.contains(e.target)) {
     toggleMenu();
   }
 }
 
+/**
+ * Toggles visibility of menu panel
+ */
 function toggleMenu() {
-  const mP = document.getElementById("background-image-menu");
-  if (mP.style.display === "block") {
-    mP.style.display = "none";
-  } else {
-    mP.style.display = "block";
-  }
+  const menuPanel = document.getElementById("background-image-menu");
+
+  if (menuPanel.style.display === "block") menuPanel.style.display = "none";
+  else menuPanel.style.display = "block";
 }
 
-/* MAIN MENU CREATION */
+/**
+ * Creates the main menu panel
+ */
 function createMenuPanel() {
   const div = document.createElement("div");
   div.className = "ui-panel-window ui-panel-window-bottom ui-menu-panel";
@@ -218,6 +239,10 @@ function createMenuPanel() {
   return div;
 }
 
+/**
+ * Creates the menu option appended to the workshop menu bar
+ * @returns {Element} div containing menuOption
+ */
 function createMenuOption() {
   const toolbar = document.getElementById("toolbar-top");
   const div = document.createElement("div");
@@ -247,6 +272,11 @@ function createMenuOption() {
   return div;
 }
 
+/**
+ * Appends new image section to main menu panel
+ * @param {String} imageData image data
+ * @returns {Element} details containing all info (details/summary tag)
+ */
 function createMenuImageSection(imageData) {
   const index = imgsList.length - 1;
   const imageName = imgsList[index].name;
@@ -306,15 +336,15 @@ function createMenuImageSection(imageData) {
   details.appendChild(checkBoxWrapper);
 
   // Size
-  const size = createSlider("Size", 30, 30, 300, 1, 2, changeSize, index);
+  const size = createSlider("Size", 30, 30, 300, 1, 2, setSize, index);
   details.appendChild(size);
 
   // X
-  const posX = createSlider("X", 50, 0, 100, 1, 3, changeXPos, index);
+  const posX = createSlider("X", 50, 0, 100, 1, 3, setXPos, index);
   details.appendChild(posX);
 
   // Y
-  const posY = createSlider("Y", 50, 0, 100, 1, 3, changeYPos, index);
+  const posY = createSlider("Y", 50, 0, 100, 1, 3, setYPos, index);
   details.appendChild(posY);
 
   // Delete
@@ -336,7 +366,16 @@ function createMenuImageSection(imageData) {
   return details;
 }
 
-/* SMALLER ITEM CREATION FUNCTIONS */
+/* --- Functions generating smaller parts of the whole --- */
+
+/**
+ * Creates an SVG based on the parameters given
+ * @param {String} name name of SVG
+ * @param {String} className class name of SVG
+ * @param {String} pathValue path value of SVG
+ * @param {Number[]} viewBox viewBox dimensions as four integers
+ * @returns {Element} SVG
+ */
 function createSVG(name, className, pathValue, viewBox) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("class", className);
@@ -362,6 +401,18 @@ function createSVG(name, className, pathValue, viewBox) {
   return svg;
 }
 
+/**
+ * Creates a Mecabricks style slider
+ * @param {String} name name of the slider
+ * @param {Number} val initial value of the slider
+ * @param {Number} min
+ * @param {Number} max
+ * @param {Number} step step size
+ * @param {Number} sensitivity sensitivity on drag (higher = less sensitive)
+ * @param {CallBack} callBack function to be called on value change
+ * @param {Number} index image index (in imgsList)
+ * @returns {Element} slider
+ */
 function createSlider(name, val, min, max, step, sensitivity, callBack, index) {
   const div = document.createElement("div");
   div.className = "ui-number-wrapper ui-position-single ui-margin-top-5";
@@ -409,6 +460,7 @@ function createSlider(name, val, min, max, step, sensitivity, callBack, index) {
 
   div.appendChild(input);
 
+  // Append values to element
   numberValue.sensitivity = sensitivity;
   numberValue.min = min;
   numberValue.max = max;
@@ -435,7 +487,12 @@ function createSlider(name, val, min, max, step, sensitivity, callBack, index) {
   return div;
 }
 
-/* SLIDER EVENT LISTENERS AND FUNCTIONS */
+/* --- Slider event listeners and other support functions --- */
+
+/**
+ * Increases the value of the element that triggered the event
+ * @param {Event} e event
+ */
 function incVal(e) {
   let tar = e.target;
   if (tar.tagName === "use") tar = tar.parentNode; // In case the path is selected
@@ -452,6 +509,11 @@ function incVal(e) {
   valEle.callBack(valEle);
 }
 
+/**
+ * Updates the slider value given user input (direct or mouse drag)
+ * @param {Element} valEle value element of slider
+ * @param {Number} val new value
+ */
 function updateValueFromSlider(valEle, val) {
   if (isNaN(val)) return;
   val = parseInt(val);
@@ -463,6 +525,10 @@ function updateValueFromSlider(valEle, val) {
   valEle.callBack(valEle);
 }
 
+/**
+ * Detects whether user is actively inputting values into slider or not
+ * @param {Event} e event (attached to slider element)
+ */
 function hideInput(e) {
   if (e.type === "keydown") {
     // Enter key
@@ -475,6 +541,10 @@ function hideInput(e) {
   updateValueFromSlider(inp.valEle, inp.value);
 }
 
+/**
+ * Sets or removes event listener for horizontal mouse drag on slider
+ * @param {Event} e event (attached to slider element)
+ */
 function horizontalMouseDrag(e) {
   let valEle = document.valEle ? document.valEle : e.target.valEle;
   if (!valEle) return;
@@ -501,12 +571,19 @@ function horizontalMouseDrag(e) {
   }
 }
 
+/**
+ * Tracks mouse position. Note: document contains information on which
+ * slider is currently being tracked.
+ * @param {Event} e event (attached to document)
+ */
 function mouseTracker(e) {
   const valEle = document.valEle;
+
   if (!valEle.moved) {
     if (e.startX !== e.clientX) valEle.moved = true;
     else return;
   }
+
   const startX = valEle.startX;
   const iniVal = valEle.iniVal;
   const sensitivity = valEle.sensitivity;

@@ -1,7 +1,10 @@
 // TODO
 // Clean up, maybe re-use functions?
-// Fix css (use classes over IDs)
 
+/**
+ * Global constant
+ * @type {Element}
+ */
 const hidUserToggle = document.getElementById("del_user");
 const numNotifyToggle = document.getElementById("num_notifications");
 const postCooldown = document.getElementById("post_cooldown");
@@ -11,50 +14,43 @@ const usersInp = document.getElementById("user-inp");
 const back = document.getElementsByClassName("back");
 const hideUserButton = document.getElementById("hide-user");
 
-/* HIDE DELETED USERS*/
-// Load saved state
-chrome.storage.sync.get("hideDeletedUsers", (data) => {
-  hidUserToggle.checked = data.hideDeletedUsers || false;
-});
+/**
+ * Sets browser
+ */
+const browser = window.browser ? window.browser : window.chrome;
 
-// Listen for changes to the checkbox
-hidUserToggle.addEventListener("change", () => {
-  const isEnabled = hidUserToggle.checked;
+/**
+ * Sets all sliders to their saved value(s)
+ */
+function setAllSliders() {
+  setupSlider("hideDeletedUsers", "hideDeletedUsers", hidUserToggle);
+  setupSlider(
+    "numberedNotifications",
+    "numberedNotifications",
+    numNotifyToggle
+  );
+  setupSlider("postCooldown", "postCooldown", postCooldown);
+}
 
-  // Save the state
-  chrome.storage.sync.set({ hideDeletedUsers: isEnabled });
-});
+async function setupSlider(objName, boolName, element) {
+  const data = await loadObject(objName);
 
-/* NUMBERED NOTIFICATIONS */
-// Load saved state
-chrome.storage.sync.get("numberedNotifications", (data) => {
-  numNotifyToggle.checked = data.numberedNotifications || false;
-});
+  const checked = data[boolName] || false; // data[boolName] could be undefined
+  element.checked = checked;
 
-// Listen for changes to the checkbox
-numNotifyToggle.addEventListener("change", () => {
-  const isEnabled = numNotifyToggle.checked;
+  element.addEventListener("change", () => {
+    const isEnabled = element.checked;
+    const obj = {};
+    obj[boolName] = isEnabled;
+    saveObject(obj);
+  });
+}
 
-  // Save the state
-  chrome.storage.sync.set({ numberedNotifications: isEnabled });
-});
-
-/* SHOW COOLDOWN */
-// Load saved state
-chrome.storage.sync.get("postCooldown", (data) => {
-  postCooldown.checked = data.postCooldown || false;
-});
-
-// Listen for changes to the checkbox
-postCooldown.addEventListener("change", () => {
-  const isEnabled = postCooldown.checked;
-
-  // Save the state
-  chrome.storage.sync.set({ postCooldown: isEnabled });
-});
+setAllSliders();
 
 // EVENT LISTENERS
 for (let i of back) i.addEventListener("mouseup", options);
+
 manageUsers.addEventListener("mouseup", listHiddenUsers);
 manageIds.addEventListener("mouseup", listIdNames);
 hideUserButton.addEventListener("mouseup", hideUser);
@@ -78,91 +74,99 @@ function createInfoText(ele, text) {
 
 /* HIDDEN USERS */
 
-function listHiddenUsers() {
+/**
+ * Creates list of hidden users
+ **/
+async function listHiddenUsers() {
   document.getElementById("options").style.display = "none";
   document.getElementById("hidden-users").style.display = "flex";
   const usersWrapper = document.getElementById("users-wrapper");
-  chrome.storage.sync.get("hiddenUsers", (data) => {
-    usersWrapper.innerHTML = "";
-    if (data.hiddenUsers) {
-      if (data.hiddenUsers.length !== 0) {
-        // Enforce that wrapper is empty
-        usersWrapper.innerHTML = "";
-        const hidUsers = data.hiddenUsers;
-        for (const user of hidUsers) {
-          wrapper = document.createElement("span");
-          wrapper.className = "items-wrapper";
 
-          const span = document.createElement("span");
-          span.textContent = user;
-          wrapper.appendChild(span);
+  const data = await loadObject("hiddenUsers");
 
-          const del = document.createElement("span");
-          del.textContent = "✖";
-          del.className = "button delete";
-          del.addEventListener("mouseup", () => {
-            unhideUser(user);
-          });
-          wrapper.appendChild(del);
+  usersWrapper.innerHTML = "";
+  if (!data.hiddenUsers) {
+    createInfoText(usersWrapper, "🛈 You have not hidden any users yet...");
+    return;
+  }
 
-          usersWrapper.appendChild(wrapper);
-        }
-      } else {
-        createInfoText(usersWrapper, "🛈 You have not hidden any users yet...");
-      }
-    } else {
-      createInfoText(usersWrapper, "🛈 You have not hidden any users yet...");
-    }
-  });
+  if (data.hiddenUsers.length === 0) {
+    createInfoText(usersWrapper, "🛈 You have not hidden any users yet...");
+    return;
+  }
+
+  // Enforce that wrapper is empty
+  usersWrapper.innerHTML = "";
+  const hidUsers = data.hiddenUsers;
+
+  for (const user of hidUsers) {
+    wrapper = document.createElement("span");
+    wrapper.className = "items-wrapper";
+
+    const span = document.createElement("span");
+    span.textContent = user;
+    wrapper.appendChild(span);
+
+    const del = document.createElement("span");
+    del.textContent = "✖";
+    del.className = "button delete";
+    del.addEventListener("mouseup", () => {
+      unhideUser(user);
+    });
+    wrapper.appendChild(del);
+
+    usersWrapper.appendChild(wrapper);
+  }
 }
 
-function hideUser() {
+async function hideUser() {
   const val = usersInp.value.trim().toLowerCase();
 
-  if (val !== "") {
-    chrome.storage.sync.get("hiddenUsers", (data) => {
-      if (data.hiddenUsers) {
-        const hidUsers = data.hiddenUsers;
-        if (!hidUsers.includes(val)) {
-          // Append to list
-          hidUsers.push(val);
-          // Sort list
-          hidUsers.sort((a, b) => a.localeCompare(b));
-          chrome.storage.sync.set({ hiddenUsers: hidUsers });
-          usersInp.setAttribute("placeholder", "");
-          listHiddenUsers();
-        } else {
-          usersInp.setAttribute("placeholder", "Already hidden");
-        }
-      } else {
-        // Create list
-        const hidUsers = [];
-        hidUsers.push(val);
-        chrome.storage.sync.set({ hiddenUsers: hidUsers });
-        usersInp.setAttribute("placeholder", "");
-        listHiddenUsers();
-      }
-    });
-  } else {
+  if (val === "") {
     usersInp.setAttribute("placeholder", "Invalid");
+    usersInp.value = "";
+    return;
   }
+
+  const data = await loadObject("hiddenUsers");
+
+  if (data.hiddenUsers) {
+    const hidUsers = data.hiddenUsers;
+    if (!hidUsers.includes(val)) {
+      // Append to list
+      hidUsers.push(val);
+      // Sort list
+      hidUsers.sort((a, b) => a.localeCompare(b));
+      saveObject({ hiddenUsers: hidUsers });
+      usersInp.setAttribute("placeholder", "");
+      listHiddenUsers();
+    } else {
+      usersInp.setAttribute("placeholder", "Already hidden");
+    }
+  } else {
+    // Create list
+    const hidUsers = [];
+    hidUsers.push(val);
+    saveObject({ hiddenUsers: hidUsers });
+    usersInp.setAttribute("placeholder", "");
+    listHiddenUsers();
+  }
+
   usersInp.value = "";
 }
 
-function unhideUser(user) {
-  console.log(user);
-  chrome.storage.sync.get("hiddenUsers", (data) => {
-    if (data.hiddenUsers) {
-      const hidUsers = data.hiddenUsers;
-      if (hidUsers.includes(user)) {
-        // Update List
-        const indx = hidUsers.indexOf(user);
-        hidUsers.splice(indx, 1);
-        chrome.storage.sync.set({ hiddenUsers: hidUsers });
-        listHiddenUsers();
-      }
-    }
-  });
+async function unhideUser(user) {
+  const data = await loadObject("hiddenUsers");
+  if (!data.hiddenUsers) return;
+
+  const hidUsers = data.hiddenUsers;
+  if (hidUsers.includes(user)) {
+    // Update List
+    const indx = hidUsers.indexOf(user);
+    hidUsers.splice(indx, 1);
+    saveObject({ hiddenUsers: hidUsers });
+    listHiddenUsers();
+  }
 }
 
 /* blocked ids */
@@ -170,7 +174,7 @@ async function listIdNames() {
   document.getElementById("options").style.display = "none";
   document.getElementById("hidden-ids").style.display = "flex";
   const idsWrapper = document.getElementById("ids-wrapper");
-  const hidden = await chrome.storage.sync.get("hidden_id_name");
+  const hidden = await loadObject("hidden_id_name");
 
   idsWrapper.innerHTML = "";
 
@@ -237,7 +241,7 @@ async function listIdNames() {
 /* COPY PASTE FROM (currently) BBCODE.JS */
 async function removeId(id, name) {
   if (!id || !name) return;
-  const previous = await chrome.storage.sync.get("hidden_id_name");
+  const previous = await loadObject("hidden_id_name");
 
   if (!previous.hidden_id_name) return;
   let newIDs = previous.hidden_id_name.ids;
@@ -261,5 +265,22 @@ async function removeId(id, name) {
   obj.hidden_id_name.ids = newIDs;
   obj.hidden_id_name.names = newNames;
 
-  chrome.storage.sync.set(obj);
+  saveObject(obj);
+}
+
+/**
+ * Sets object in browser
+ * @param {String} name name of object
+ * @returns {Promise} promise of object
+ */
+function loadObject(name) {
+  return browser.storage.sync.get(name);
+}
+
+/**
+ * Sets object in browser
+ * @param {JSON} obj object
+ */
+function saveObject(obj) {
+  browser.storage.sync.set(obj);
 }
