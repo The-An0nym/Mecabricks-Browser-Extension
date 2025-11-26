@@ -4,20 +4,6 @@
  */
 
 /**
- * GLOBAL CONSTANTS
- * @var pathname is a list of all folders or file names after *BASEURL/LANG/*
- */
-const pathname =
-  window.location.pathname[3] === "/"
-    ? window.location.pathname.split("/").slice(2)
-    : window.location.pathname.split("/").slice(1);
-const fullUrl = window.location.href;
-const lang =
-  window.location.pathname[3] === "/"
-    ? window.location.pathname.slice(1, 3)
-    : "en";
-
-/**
  * Determines which functions need to be executing
  * based on what page the user currently is.
  */
@@ -141,75 +127,95 @@ const main = function () {
   else if (document.querySelector("#header-notifications"))
     checkNotifications();
 
-  // Hide deleted users
-  chrome.storage.sync.get("hideDeletedUsers", (data) => {
-    if (!data.hideDeletedUsers) return;
-    if (pathname[0] === "models") removeComments([""]);
-    if (pathname[1] === "topic") removePosts([""]);
-  });
+  hideDeletedUsers();
+  numberedNotifications();
+  hiddenUsers();
+  hiddenDiscussions();
+};
 
-  // Numbered notifications
-  chrome.storage.sync.get("numberedNotifications", (data) => {
-    if (!data.numberedNotifications) {
-      document.body.style.setProperty("--font-color", "white");
-    } else {
-      if (pathname[0] !== "partmanager" && pathname[1] !== "notifications") {
-        if (document.getElementById("header-notifications")) {
-          badge = document.getElementById("header-notifications");
-          badge.innerText = "";
-          badge.style.padding = "0";
-          badge.style.width = "16px";
-          badge.style.height = "16px";
-          badge.style.marginLeft = "-2px";
-          badge.style.borderRadius = "50%";
-        }
+/**
+ * Calls are necessary functions to hide deleted users
+ */
+async function hideDeletedUsers() {
+  const data = await browser.storage.sync.get("hideDeletedUsers");
+
+  if (!data.hideDeletedUsers) return;
+  if (pathname[0] === "models") removeComments([""]);
+  if (pathname[1] === "topic") removePosts([""]);
+}
+
+/**
+ * Formats notification badge to show (or not show) numbers
+ */
+async function numberedNotifications() {
+  const data = await browser.storage.sync.get("numberedNotifications");
+  if (!data.numberedNotifications) {
+    document.body.style.setProperty("--font-color", "white");
+  } else {
+    if (pathname[0] !== "partmanager" && pathname[1] !== "notifications") {
+      if (document.getElementById("header-notifications")) {
+        badge = document.getElementById("header-notifications");
+        badge.innerText = "";
+        badge.style.padding = "0";
+        badge.style.width = "16px";
+        badge.style.height = "16px";
+        badge.style.marginLeft = "-2px";
+        badge.style.borderRadius = "50%";
       }
     }
-  });
+  }
+}
 
-  // Hidden users
-  chrome.storage.sync.get("hiddenUsers", (data) => {
-    if (!data.hiddenUsers) return;
-    if (data.hiddenUsers.length === 0) return;
+/**
+ * Deals with all hidden users
+ */
+async function hiddenUsers() {
+  const data = await browser.storage.sync.get("hiddenUsers");
 
-    if (pathname[0] === "models") removeComments(data.hiddenUsers);
-    else if (pathname[1] === "topic") removePosts(data.hiddenUsers);
-    else if (pathname[0] === "library") removeModels(data.hiddenUsers);
-    else if (pathname[0] === "") removeModels(data.hiddenUsers);
-    else if (pathname[1] === "category") removeThread(data.hiddenUsers);
-    else {
-      const config = { childList: true };
-      if (pathname[1] === "messages") {
-        const targetNode = document.getElementsByClassName("nano-content")[0];
-        const observer = new MutationObserver(() => {
-          removeMessages(data.hiddenUsers);
-        });
-        observer.observe(targetNode, config);
-      } else if (pathname[1] === "notifications") {
-        const targetNode = document.getElementById("notifications");
-        const observer = new MutationObserver(() => {
-          removeNotifications(data.hiddenUsers);
-        });
-        observer.observe(targetNode, config);
-      }
-    }
-  });
+  if (!data.hiddenUsers) return;
+  if (data.hiddenUsers.length === 0) return;
 
-  // Hide threads
-  chrome.storage.sync.get("hidden_id_name", (data) => {
-    if (!data.hidden_id_name) return;
-    if (data.hidden_id_name.length === 0) return;
-
-    if (pathname[1] === "notifications") {
-      const targetNode = document.getElementById("notifications");
-      const config = { childList: true };
+  if (pathname[0] === "models") removeComments(data.hiddenUsers);
+  else if (pathname[1] === "topic") removePosts(data.hiddenUsers);
+  else if (pathname[0] === "library") removeModels(data.hiddenUsers);
+  else if (pathname[0] === "") removeModels(data.hiddenUsers);
+  else if (pathname[1] === "category") removeThread(data.hiddenUsers);
+  else {
+    const config = { childList: true };
+    if (pathname[1] === "messages") {
+      const targetNode = document.getElementsByClassName("nano-content")[0];
       const observer = new MutationObserver(() => {
-        removeById(data.hidden_id_name.ids);
+        removeMessages(data.hiddenUsers);
+      });
+      observer.observe(targetNode, config);
+    } else if (pathname[1] === "notifications") {
+      const targetNode = document.getElementById("notifications");
+      const observer = new MutationObserver(() => {
+        removeNotifications(data.hiddenUsers);
       });
       observer.observe(targetNode, config);
     }
-  });
-};
+  }
+}
+
+/**
+ * Hides discussions on forums
+ * @returns
+ */
+async function hiddenDiscussions() {
+  const data = browser.storage.sync.get("hidden_id_name");
+  if (!data.hidden_id_name) return;
+  if (data.hidden_id_name.length === 0) return;
+
+  if (pathname[1] === "notifications") {
+    const targetNode = document.getElementById("notifications");
+    const config = { childList: true };
+    const observer = new MutationObserver(() => {
+      removeById(data.hidden_id_name.ids);
+    });
+    observer.observe(targetNode, config);
+  }
+}
 
 /**
  * Starting point of everything

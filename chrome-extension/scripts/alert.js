@@ -13,10 +13,10 @@ function tryRemoval() {
  */
 
 async function getTimer() {
-  const enabled = await chrome.storage.sync.get("postCooldown");
+  const enabled = await browser.storage.sync.get("postCooldown");
   if (!enabled.postCooldown) return;
 
-  const data = await chrome.storage.sync.get("lastPost");
+  const data = await browser.storage.sync.get("lastPost");
   if (!data.lastPost) return;
   const datetime = data.lastPost;
   const now = Date.parse(new Date());
@@ -49,14 +49,14 @@ function update(datetime, ele) {
  * Sets timestamp of event in chrome storage
  */
 async function setTimer() {
-  const data = await chrome.storage.sync.get("lastPost");
+  const data = await browser.storage.sync.get("lastPost");
   const now = Date.parse(new Date());
   if (data.lastPost) {
     const datetime = Date.parse(data.lastPost);
     if (now - datetime < 1000 * 60) return;
   }
 
-  chrome.storage.sync.set({ lastPost: now });
+  browser.storage.sync.set({ lastPost: now });
 }
 
 // Always call timer on page refresh in case the timer is still running

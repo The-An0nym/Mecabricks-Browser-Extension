@@ -445,7 +445,7 @@ async function modelSubButton() {
  * @returns {boolean} unsubscribed?
  */
 async function unsubscribed(id) {
-  const hidden = await chrome.storage.sync.get("hidden_id_name");
+  const hidden = await browser.storage.sync.get("hidden_id_name");
   if (hidden.hidden_id_name) return hidden.hidden_id_name.ids.includes(id);
   else return false;
 }
@@ -458,7 +458,7 @@ async function unsubscribed(id) {
  */
 async function storeId(id, name) {
   if (!id || !name) return;
-  const previous = await chrome.storage.sync.get("hidden_id_name");
+  const previous = await browser.storage.sync.get("hidden_id_name");
   let newIDs = [];
   let newNames = [];
   if (previous.hidden_id_name) {
@@ -477,7 +477,7 @@ async function storeId(id, name) {
   obj.hidden_id_name.ids = newIDs;
   obj.hidden_id_name.names = newNames;
 
-  chrome.storage.sync.set(obj);
+  browser.storage.sync.set(obj);
 }
 
 /**
@@ -488,7 +488,7 @@ async function storeId(id, name) {
 
 async function removeId(id, name) {
   if (!id || !name) return;
-  const previous = await chrome.storage.sync.get("hidden_id_name");
+  const previous = await browser.storage.sync.get("hidden_id_name");
 
   if (!previous.hidden_id_name) return;
   let newIDs = previous.hidden_id_name.ids;
@@ -512,5 +512,5 @@ async function removeId(id, name) {
   obj.hidden_id_name.ids = newIDs;
   obj.hidden_id_name.names = newNames;
 
-  chrome.storage.sync.set(obj);
+  browser.storage.sync.set(obj);
 }
