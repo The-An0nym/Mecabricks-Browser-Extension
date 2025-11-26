@@ -32,7 +32,6 @@
         "scripts/main.js"
       ],
       "css": ["styles/main.css"],
-      "runAt": "document_start",
       "matches": ["https://mecabricks.com/*", "https://www.mecabricks.com/*"]
     }
   ]
