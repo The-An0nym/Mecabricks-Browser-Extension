@@ -94,7 +94,7 @@ function setNotificationHistory(notifications) {
     const dataBlock = {};
     const key = "notificationHistory" + Math.floor(i / 12);
     dataBlock[key] = notifications.slice(i, i + 12);
-    browser.storage.sync.set(dataBlock);
+    b.storage.sync.set(dataBlock);
   }
 }
 
@@ -180,9 +180,9 @@ function sameOrigin(notif1, notif2) {
  * by the user. If yes, mark the notifications as read and remove the notification badge.
  */
 async function checkNotifications() {
-  const sHiddenUsers = await browser.storage.sync.get("hiddenUsers");
-  const sHidIds = await browser.storage.sync.get("hidden_id_name");
-  const sHideDeletedUsers = await browser.storage.sync.get("hideDeletedUsers");
+  const sHiddenUsers = await b.storage.sync.get("hiddenUsers");
+  const sHidIds = await b.storage.sync.get("hidden_id_name");
+  const sHideDeletedUsers = await b.storage.sync.get("hideDeletedUsers");
   const hidUsers = sHiddenUsers.hiddenUsers;
 
   const hidIds = sHidIds.hidden_id_name
@@ -193,7 +193,7 @@ async function checkNotifications() {
 
   if (!hidUsers && !hidIds && !hideDelUsers) return;
 
-  const sNotificationsHistory0 = await browser.storage.sync.get(
+  const sNotificationsHistory0 = await b.storage.sync.get(
     "notificationHistory0"
   );
   const notifHistory0 = sNotificationsHistory0.notificationHistory0;
@@ -234,7 +234,7 @@ async function getNotificationHistory() {
   // Notifications are stored over several objects due to their large size
   for (let i = 0; i < 25; i++) {
     const key = "notificationHistory" + i;
-    const notifBlock = await browser.storage.sync.get(key);
+    const notifBlock = await b.storage.sync.get(key);
     if (!notifBlock[key]) break;
     notifications = notifications.concat(notifBlock[key]);
   }
@@ -315,7 +315,7 @@ async function newSendersBlocked(notif, hidUsers) {
   // 300 / 12 = 25
   for (let i = 0; i < 25; i++) {
     const histKey = "notificationHistory" + i;
-    const notifBlock = await browser.storage.sync.get(histKey);
+    const notifBlock = await b.storage.sync.get(histKey);
     if (!notifBlock[histKey]) return false; // As not every is blocked, there will be a new non-hidden user
     for (const oldNotif of notifBlock[histKey]) {
       if (!sameOrigin(oldNotif, notif)) continue;
@@ -364,7 +364,7 @@ async function newSendersBlocked(notif, hidUsers) {
  * @param {JSON} notif notification object
  */
 async function blackListNotifications(notif) {
-  const preList = await browser.storage.sync.get("idBlacklist");
+  const preList = await b.storage.sync.get("idBlacklist");
   const obj = {};
 
   let id;
@@ -376,7 +376,7 @@ async function blackListNotifications(notif) {
 
   if (preList.idBlacklist) obj.idBlackList = preList.idBlackList.push(id);
   else obj.idBlackList = [id];
-  browser.storage.sync.set(obj);
+  b.storage.sync.set(obj);
 }
 
 /**
@@ -385,7 +385,7 @@ async function blackListNotifications(notif) {
  */
 
 async function storeLatestNotifications() {
-  const notifHist0 = await browser.storage.sync.get("notificationHistory0");
+  const notifHist0 = await b.storage.sync.get("notificationHistory0");
   if (!notifHist0.notificationHistory0) {
     loadHistory();
     return;

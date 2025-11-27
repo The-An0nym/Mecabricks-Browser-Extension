@@ -4,12 +4,45 @@
  */
 
 /**
+ * GLOBAL CONSTANTS
+ * @contant {String[]} pathname is a list of all folders or file names after *BASEURL/LANG/*
+ */
+const pathname =
+  window.location.pathname[3] === "/"
+    ? window.location.pathname.split("/").slice(2)
+    : window.location.pathname.split("/").slice(1);
+
+/**
+ * GLOBAL CONSTANT
+ * @constant {String} fullURL full URL
+ */
+const fullUrl = window.location.href;
+
+/**
+ * GLOBAL CONSTANT
+ * @constant {String} lang language (2 letters)
+ */
+const lang =
+  window.location.pathname[3] === "/"
+    ? window.location.pathname.slice(1, 3)
+    : "en";
+
+/**
+ * GLOBAL CONSTANT
+ * @constant b browser context of user
+ */
+const b = typeof browser !== "undefined" ? browser : chrome;
+
+/**
  * Determines which functions need to be executing
  * based on what page the user currently is.
  */
 const main = function () {
   // Guard clause in case the website is down
   if (document.title == "503 Service Unavailable") return;
+
+  // Always call timer on page refresh in case the timer is still running
+  getTimer(); // alert.js
 
   switch (pathname[0]) {
     // Personal account
@@ -137,7 +170,7 @@ const main = function () {
  * Calls are necessary functions to hide deleted users
  */
 async function hideDeletedUsers() {
-  const data = await browser.storage.sync.get("hideDeletedUsers");
+  const data = await b.storage.sync.get("hideDeletedUsers");
 
   if (!data.hideDeletedUsers) return;
   if (pathname[0] === "models") removeComments([""]);
@@ -148,7 +181,7 @@ async function hideDeletedUsers() {
  * Formats notification badge to show (or not show) numbers
  */
 async function numberedNotifications() {
-  const data = await browser.storage.sync.get("numberedNotifications");
+  const data = await b.storage.sync.get("numberedNotifications");
   if (!data.numberedNotifications) {
     document.body.style.setProperty("--font-color", "white");
   } else {
@@ -170,7 +203,7 @@ async function numberedNotifications() {
  * Deals with all hidden users
  */
 async function hiddenUsers() {
-  const data = await browser.storage.sync.get("hiddenUsers");
+  const data = await b.storage.sync.get("hiddenUsers");
 
   if (!data.hiddenUsers) return;
   if (data.hiddenUsers.length === 0) return;
@@ -203,7 +236,7 @@ async function hiddenUsers() {
  * @returns
  */
 async function hiddenDiscussions() {
-  const data = browser.storage.sync.get("hidden_id_name");
+  const data = b.storage.sync.get("hidden_id_name");
   if (!data.hidden_id_name) return;
   if (data.hidden_id_name.length === 0) return;
 

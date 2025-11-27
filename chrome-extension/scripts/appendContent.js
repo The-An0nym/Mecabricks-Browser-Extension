@@ -259,7 +259,6 @@ function privateLibrarySetup() {
   ta.style.maxHeight = "480px";
   ta.style.width = "640px";
   ta.parentNode.style.height = "auto";
-  ta.parentNode.style.paddingBottom = "0"; // Remove thicker bottom edge
   ta.parentNode.style.width = "660px";
 
   // Character Limit
@@ -445,7 +444,7 @@ async function modelSubButton() {
  * @returns {boolean} unsubscribed?
  */
 async function unsubscribed(id) {
-  const hidden = await browser.storage.sync.get("hidden_id_name");
+  const hidden = await b.storage.sync.get("hidden_id_name");
   if (hidden.hidden_id_name) return hidden.hidden_id_name.ids.includes(id);
   else return false;
 }
@@ -458,7 +457,7 @@ async function unsubscribed(id) {
  */
 async function storeId(id, name) {
   if (!id || !name) return;
-  const previous = await browser.storage.sync.get("hidden_id_name");
+  const previous = await b.storage.sync.get("hidden_id_name");
   let newIDs = [];
   let newNames = [];
   if (previous.hidden_id_name) {
@@ -477,7 +476,7 @@ async function storeId(id, name) {
   obj.hidden_id_name.ids = newIDs;
   obj.hidden_id_name.names = newNames;
 
-  browser.storage.sync.set(obj);
+  b.storage.sync.set(obj);
 }
 
 /**
@@ -488,7 +487,7 @@ async function storeId(id, name) {
 
 async function removeId(id, name) {
   if (!id || !name) return;
-  const previous = await browser.storage.sync.get("hidden_id_name");
+  const previous = await b.storage.sync.get("hidden_id_name");
 
   if (!previous.hidden_id_name) return;
   let newIDs = previous.hidden_id_name.ids;
@@ -512,5 +511,5 @@ async function removeId(id, name) {
   obj.hidden_id_name.ids = newIDs;
   obj.hidden_id_name.names = newNames;
 
-  browser.storage.sync.set(obj);
+  b.storage.sync.set(obj);
 }
