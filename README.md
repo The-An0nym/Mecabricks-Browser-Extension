@@ -12,7 +12,7 @@ https://chromewebstore.google.com/detail/mecabricks-improvements/endjoodhbfgmdfc
 
 ### Firefox:
 
-WIP - Currently being reviewed
+https://addons.mozilla.org/en-US/firefox/addon/mecabricks-improvements
 
 ## Features
 
