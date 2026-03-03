@@ -299,7 +299,7 @@ function commentCharLimit() {
   // Character Limit
   const div = document.createElement("div");
   div.textContent = ta.value.length + "/500";
-  div.className = "comment-character-limit";
+  div.id = "comment-character-limit";
 
   ta.parentNode.appendChild(div);
 
@@ -308,6 +308,14 @@ function commentCharLimit() {
     if (ta.value.length > 500) div.style.color = "#ed1c24";
     else div.style.color = "#000";
   });
+}
+
+/**
+ * Clears comment reply box (triggeres after posting comment)
+ */
+function clearCommentCharCount() {
+  const span = document.getElementById("comment-character-limit");
+  span.textContent = "0/500";
 }
 
 /**

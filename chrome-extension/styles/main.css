@@ -180,7 +180,7 @@ a > .notifications {
   font-weight: 800;
 }
 
-.comment-character-limit {
+#comment-character-limit {
   color: #000;
   position: absolute;
   width: 70px;

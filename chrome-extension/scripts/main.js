@@ -137,6 +137,7 @@ const main = function () {
         .addEventListener("mouseup", () => {
           setTimer();
           getTimer();
+          clearCommentCharCount();
         });
       break;
 
